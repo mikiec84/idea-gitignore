@@ -24,7 +24,9 @@
 
 package mobi.hsz.idea.gitignore.actions;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.testFramework.TestActionEvent;
 import mobi.hsz.idea.gitignore.Common;
 import mobi.hsz.idea.gitignore.IgnoreBundle;
 import mobi.hsz.idea.gitignore.file.type.IgnoreFileType;
@@ -43,6 +45,9 @@ public class AddTemplateActionTest extends Common<AddTemplateAction> {
         Assert.assertEquals(IgnoreBundle.message("action.addTemplate"), presentation.getText());
         Assert.assertEquals(IgnoreBundle.message("action.addTemplate.description"), presentation.getDescription());
         Assert.assertFalse("Action is not visible if there is no Ignore file context", presentation.isEnabledAndVisible());
+
+        AnActionEvent e = new TestActionEvent();
+        action.actionPerformed(e);
 
         myFixture.configureByText(IgnoreFileType.INSTANCE, "foo");
         presentation = myFixture.testAction(action);
