@@ -24,6 +24,7 @@
 
 package mobi.hsz.idea.gitignore.util;
 
+import com.google.inject.Inject;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
@@ -75,6 +76,7 @@ public class CacheMap {
     }
 
     /** Constructor. */
+    @Inject
     public CacheMap(@NotNull Project project) {
         this.project = project;
         this.statusManager = FileStatusManager.getInstance(project);

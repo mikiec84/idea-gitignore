@@ -24,9 +24,11 @@
 
 package mobi.hsz.idea.gitignore;
 
+import com.google.inject.Inject;
 import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.AbstractProjectComponent;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -59,6 +61,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 import static mobi.hsz.idea.gitignore.settings.IgnoreSettings.KEY;
@@ -69,7 +72,7 @@ import static mobi.hsz.idea.gitignore.settings.IgnoreSettings.KEY;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 1.0
  */
-public class IgnoreManager extends AbstractProjectComponent {
+public class IgnoreManager implements ProjectComponent {
     /** Delay between checking if psiManager was initialized. */
     private static final int REQUEST_DELAY = 200;
 
@@ -77,22 +80,22 @@ public class IgnoreManager extends AbstractProjectComponent {
     @NonNls
     private static final String PROCESS_NAME = "Ignore indexing";
 
+    /** {@link IgnoreSettings} instance. */
+    @Inject
+    private IgnoreSettings settings;
+
     /** {@link CacheMap} instance. */
-    @NotNull
-    private final CacheMap cache;
+    @Inject
+    private CacheMap cache;
 
     /** {@link PsiManager} instance. */
-    @NotNull
-    private final PsiManagerImpl psiManager;
+    @Inject
+    private PsiManagerImpl psiManager;
 
     /** {@link VirtualFileManager} instance. */
-    @NotNull
-    private final VirtualFileManager virtualFileManager;
-
-    /** {@link IgnoreSettings} instance. */
-    @NotNull
-    private final IgnoreSettings settings;
-
+    @Inject
+    private VirtualFileManager virtualFileManager;
+    
     /** {@link MessageBusConnection} instance. */
     private MessageBusConnection messageBus;
 
@@ -106,6 +109,9 @@ public class IgnoreManager extends AbstractProjectComponent {
     /** {@link ProgressIndicator} instance. */
     @NotNull
     private final ProgressIndicator refreshIndicator = new RefreshProgress(IgnoreBundle.message("cache.indexing"));
+
+    /** Current {@link Project}. */
+    private Project project;
 
     /** {@link VirtualFileListener} instance to watch filesystem changes. */
     @NotNull
@@ -274,17 +280,8 @@ public class IgnoreManager extends AbstractProjectComponent {
         return project.getComponent(IgnoreManager.class);
     }
 
-    /**
-     * Constructor builds {@link IgnoreManager} instance.
-     *
-     * @param project current project
-     */
-    public IgnoreManager(@NotNull final Project project) {
-        super(project);
-        cache = new CacheMap(project);
-        psiManager = (PsiManagerImpl) PsiManager.getInstance(project);
-        virtualFileManager = VirtualFileManager.getInstance();
-        settings = IgnoreSettings.getInstance();
+    /** Constructor builds {@link IgnoreManager} instance. */
+    public IgnoreManager() {
     }
 
     /**
@@ -327,7 +324,7 @@ public class IgnoreManager extends AbstractProjectComponent {
         }
 
         VirtualFile parent = file.getParent();
-        while (parent != null && Utils.isInProject(parent, myProject)) {
+        while (parent != null && Utils.isInProject(parent, project)) {
             if (isFileIgnored(parent)) {
                 return true;
             }
@@ -368,7 +365,7 @@ public class IgnoreManager extends AbstractProjectComponent {
         virtualFileManager.addVirtualFileListener(virtualFileListener);
         psiManager.addPsiTreeChangeListener(psiTreeChangeListener);
         settings.addListener(settingsListener);
-        messageBus = myProject.getMessageBus().connect();
+        messageBus = project.getMessageBus().connect();
         messageBus.subscribe(ProjectLevelVcsManager.VCS_CONFIGURATION_CHANGED, vcsListener);
         working = true;
 
@@ -422,7 +419,7 @@ public class IgnoreManager extends AbstractProjectComponent {
             return;
         }
 
-        DumbService.getInstance(myProject).smartInvokeLater(new Runnable() {
+        DumbService.getInstance(project).smartInvokeLater(new Runnable() {
             @Override
             public void run() {
                 queue.submit(new Runnable() {
@@ -444,7 +441,7 @@ public class IgnoreManager extends AbstractProjectComponent {
                                     }
                                 }
                                 // Search for Ignore files in the project
-                                final GlobalSearchScope scope = GlobalSearchScope.allScope(myProject);
+                                final GlobalSearchScope scope = GlobalSearchScope.allScope(project);
                                 final List<IgnoreFile> files = ContainerUtil.newArrayList();
                                 AccessToken readAccessToken = ApplicationManager.getApplication().acquireReadActionLock();
                                 try {
@@ -474,12 +471,12 @@ public class IgnoreManager extends AbstractProjectComponent {
                                             if (!language.isEnabled()) {
                                                 continue;
                                             }
-                                            for (VirtualFile outerFile : language.getOuterFiles(myProject)) {
+                                            for (VirtualFile outerFile : language.getOuterFiles(project)) {
                                                 if (outerFile.exists()) {
                                                     PsiFile psiFile = psiManager.findFile(outerFile);
                                                     if (psiFile != null) {
                                                         try {
-                                                            IgnoreFile outerIgnoreFile = (IgnoreFile) PsiFileFactory.getInstance(myProject)
+                                                            IgnoreFile outerIgnoreFile = (IgnoreFile) PsiFileFactory.getInstance(project)
                                                                     .createFileFromText(language.getFilename(), language, psiFile.getText());
                                                             outerIgnoreFile.setOriginalFile(psiFile);
                                                             addTaskFor(outerIgnoreFile);
@@ -498,10 +495,10 @@ public class IgnoreManager extends AbstractProjectComponent {
                                 refreshIndicator.stop();
                             }
                         } finally {
-                            DumbService.getInstance(myProject).runWhenSmart(new Runnable() {
+                            DumbService.getInstance(project).runWhenSmart(new Runnable() {
                                 @Override
                                 public void run() {
-                                    FileStatusManager.getInstance(myProject).fileStatusesChanged();
+                                    FileStatusManager.getInstance(project).fileStatusesChanged();
                                 }
                             });
                         }
@@ -539,7 +536,7 @@ public class IgnoreManager extends AbstractProjectComponent {
                             return;
                         }
                         final VirtualFile virtualFile = file.getVirtualFile();
-                        VirtualFile projectDir = myProject.getBaseDir();
+                        VirtualFile projectDir = project.getBaseDir();
 
                         if ((!file.isOuter() && (virtualFile == null || isFileIgnored(virtualFile))) || projectDir == null) {
                             return;
@@ -574,5 +571,89 @@ public class IgnoreManager extends AbstractProjectComponent {
     @Override
     public String getComponentName() {
         return "IgnoreManager";
+    }
+
+    /**
+     * Set current project.
+     * 
+     * @param project current project
+     */
+    public void setProject(@NotNull Project project) {
+        this.project = project;
+    }
+
+    /**
+     * Component should perform initialization and communication with other components in this method.
+     * This is called after {@link PersistentStateComponent#loadState(Object)}.
+     */
+    @Override
+    public void initComponent() {
+    }
+
+    /**
+     * Component should dispose system resources or perform other cleanup in this method.
+     */
+    @Override
+    public void disposeComponent() {
+    }
+
+    /**
+     * Proxy class for {@link IgnoreManager} to supply all the DependencyInjection flavours.
+     */
+    private static class Proxy extends IgnoreManager {
+
+        private final IgnoreManager delegate;
+
+        /**
+         * Constructor builds {@link Proxy} instance.
+         *
+         * @param project current project
+         */
+        public Proxy(@NotNull Project project) throws ExecutionException {
+            super();
+            delegate = IgnoreModule.getInstance(project, IgnoreManager.class);
+            delegate.setProject(project);
+        }
+
+        @Override
+        public boolean isFileIgnored(@NotNull VirtualFile file) {
+            return delegate.isFileIgnored(file);
+        }
+
+        @Override
+        public boolean isParentIgnored(@NotNull VirtualFile file) {
+            return delegate.isParentIgnored(file);
+        }
+
+        @Override
+        public void projectOpened() {
+            delegate.projectOpened();
+        }
+
+        @Override
+        public void projectClosed() {
+            delegate.projectClosed();
+        }
+
+        @NotNull
+        @Override
+        public String getComponentName() {
+            return delegate.getComponentName();
+        }
+
+        @Override
+        public void setProject(@NotNull Project project) {
+            delegate.setProject(project);
+        }
+
+        @Override
+        public void initComponent() {
+            delegate.initComponent();
+        }
+
+        @Override
+        public void disposeComponent() {
+            delegate.disposeComponent();
+        }
     }
 }
