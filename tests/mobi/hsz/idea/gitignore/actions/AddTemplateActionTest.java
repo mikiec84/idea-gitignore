@@ -29,28 +29,52 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.testFramework.TestActionEvent;
 import mobi.hsz.idea.gitignore.Common;
 import mobi.hsz.idea.gitignore.IgnoreBundle;
+import mobi.hsz.idea.gitignore.IgnoreTestModule;
 import mobi.hsz.idea.gitignore.file.type.IgnoreFileType;
-import org.junit.Assert;
+import mobi.hsz.idea.gitignore.ui.GeneratorDialog;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.Test;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 1.5
  */
 public class AddTemplateActionTest extends Common<AddTemplateAction> {
-    public void testAddTemplateActionInvocation() {
-        final AddTemplateAction action = new AddTemplateAction();
-        Presentation presentation;
 
-        presentation = myFixture.testAction(action);
-        Assert.assertEquals(IgnoreBundle.message("action.addTemplate"), presentation.getText());
-        Assert.assertEquals(IgnoreBundle.message("action.addTemplate.description"), presentation.getDescription());
-        Assert.assertFalse("Action is not visible if there is no Ignore file context", presentation.isEnabledAndVisible());
+    @Mock
+    private GeneratorDialog dialog;
+
+    @InjectMocks
+    private AddTemplateAction action;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        
+        action = IgnoreTestModule.getInstance(AddTemplateAction.class, getProject());
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void testAddTemplateActionInvocation() {
+        Presentation presentation = myFixture.testAction(action);
+        
+        assertEquals(IgnoreBundle.message("action.addTemplate"), presentation.getText());
+        assertEquals(IgnoreBundle.message("action.addTemplate.description"), presentation.getDescription());
+        assertFalse("Action is not visible if there is no Ignore file context", presentation.isEnabledAndVisible());
 
         AnActionEvent e = new TestActionEvent();
         action.actionPerformed(e);
-
         myFixture.configureByText(IgnoreFileType.INSTANCE, "foo");
         presentation = myFixture.testAction(action);
-        Assert.assertTrue("Action is visible if there is Ignore file context", presentation.isEnabledAndVisible());
+        
+        assertTrue("Action is visible if there is Ignore file context", presentation.isEnabledAndVisible());
+        verify(dialog, times(1)).setFile(myFixture.getFile());
+        verify(dialog, times(1)).show();
     }
 }

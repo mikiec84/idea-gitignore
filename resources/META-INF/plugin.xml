@@ -444,7 +444,7 @@
             <add-to-group group-id="ConsoleEditorPopupMenu"/>
         </group>
         <group id="Ignore.TemplateGroup">
-            <action id="Ignore.AddTemplate" class="mobi.hsz.idea.gitignore.actions.AddTemplateAction"/>
+            <action id="Ignore.AddTemplate" class="mobi.hsz.idea.gitignore.actions.AddTemplateAction$Proxy"/>
             <action id="IgnoreCreateUserTemplate" class="mobi.hsz.idea.gitignore.actions.CreateUserTemplateAction"/>
             <add-to-group group-id="EditorPopupMenu"/>
             <add-to-group group-id="ProjectViewPopupMenu"/>
@@ -453,7 +453,7 @@
             <add-to-group group-id="GenerateGroup" anchor="first"/>
         </group>
 
-        <action id="CloseIgnoredEditors" class="mobi.hsz.idea.gitignore.actions.CloseIgnoredEditorsAction">
+        <action id="CloseIgnoredEditors" class="mobi.hsz.idea.gitignore.actions.CloseIgnoredEditorsAction$Proxy">
             <add-to-group group-id="CloseEditorsGroup" anchor="before" relative-to-action="CloseAllUnpinnedEditors"/>
         </action>
     </actions>

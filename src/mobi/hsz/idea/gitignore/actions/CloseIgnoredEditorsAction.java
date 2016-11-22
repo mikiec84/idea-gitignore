@@ -24,6 +24,7 @@
 
 package mobi.hsz.idea.gitignore.actions;
 
+import com.google.inject.Inject;
 import com.intellij.ide.actions.CloseEditorsActionBase;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileEditor.impl.EditorComposite;
@@ -32,7 +33,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import mobi.hsz.idea.gitignore.IgnoreBundle;
+import mobi.hsz.idea.gitignore.IgnoreModule;
 import mobi.hsz.idea.gitignore.vcs.IgnoreFileStatusProvider;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * Action that closes all opened files that are marked as {@link IgnoreFileStatusProvider#IGNORED}.
@@ -41,6 +45,12 @@ import mobi.hsz.idea.gitignore.vcs.IgnoreFileStatusProvider;
  * @since 1.2
  */
 public class CloseIgnoredEditorsAction extends CloseEditorsActionBase {
+    @Inject
+    private FileStatusManager fileStatusManager;
+    
+    @Inject
+    private ProjectLevelVcsManager projectLevelVcsManager;
+    
     /**
      * Obtains if editor is allowed to be closed.
      *
@@ -48,9 +58,7 @@ public class CloseIgnoredEditorsAction extends CloseEditorsActionBase {
      */
     @Override
     protected boolean isFileToClose(final EditorComposite editor, final EditorWindow window) {
-        final FileStatusManager fileStatusManager = FileStatusManager.getInstance(window.getManager().getProject());
-        return fileStatusManager != null &&
-                fileStatusManager.getStatus(editor.getFile()).equals(IgnoreFileStatusProvider.IGNORED);
+        return fileStatusManager.getStatus(editor.getFile()).equals(IgnoreFileStatusProvider.IGNORED);
     }
 
     /**
@@ -60,8 +68,7 @@ public class CloseIgnoredEditorsAction extends CloseEditorsActionBase {
      */
     @Override
     protected boolean isActionEnabled(final Project project, final AnActionEvent event) {
-        return super.isActionEnabled(project, event) &&
-                ProjectLevelVcsManager.getInstance(project).getAllActiveVcss().length > 0;
+        return super.isActionEnabled(project, event) && projectLevelVcsManager.getAllActiveVcss().length > 0;
     }
 
     /**
@@ -73,5 +80,29 @@ public class CloseIgnoredEditorsAction extends CloseEditorsActionBase {
     @Override
     protected String getPresentationText(final boolean inSplitter) {
         return inSplitter ? IgnoreBundle.message("action.closeIgnored.editors.in.tab.group") : IgnoreBundle.message("action.closeIgnored.editors");
+    }
+
+    /** Proxy class for {@link CloseIgnoredEditorsAction} to supply all the DependencyInjection flavours. */
+    private static class Proxy extends CloseIgnoredEditorsAction {
+        private final CloseIgnoredEditorsAction delegate;
+
+        public Proxy() throws ExecutionException {
+            delegate = IgnoreModule.getInstance(CloseIgnoredEditorsAction.class);
+        }
+
+        @Override
+        protected boolean isFileToClose(EditorComposite editor, EditorWindow window) {
+            return delegate.isFileToClose(editor, window);
+        }
+
+        @Override
+        protected boolean isActionEnabled(Project project, AnActionEvent event) {
+            return delegate.isActionEnabled(project, event);
+        }
+
+        @Override
+        protected String getPresentationText(boolean inSplitter) {
+            return delegate.getPresentationText(inSplitter);
+        }
     }
 }

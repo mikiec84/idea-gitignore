@@ -27,24 +27,19 @@ package mobi.hsz.idea.gitignore;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ServiceManager;
+import com.google.inject.Singleton;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.PsiManagerImpl;
-import mobi.hsz.idea.gitignore.actions.AddTemplateAction;
-import mobi.hsz.idea.gitignore.outer.OuterIgnoreLoaderComponent;
-import mobi.hsz.idea.gitignore.settings.IgnoreSettings;
-import mobi.hsz.idea.gitignore.util.UtilsModule;
+import mobi.hsz.idea.gitignore.ui.GeneratorDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mockito.Mockito;
 
 import java.util.concurrent.ExecutionException;
 
@@ -52,69 +47,55 @@ import java.util.concurrent.ExecutionException;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 1.6
  */
-public class IgnoreModule extends AbstractModule {
+public class IgnoreTestModule extends IgnoreModule {
     private static final LoadingCache<Project, Injector> injector = CacheBuilder.newBuilder().build(
-        new CacheLoader<Project, Injector>() {
-            public Injector load(@NotNull Project project) {
-                return Guice.createInjector(new IgnoreModule(project));
+            new CacheLoader<Project, Injector>() {
+                public Injector load(@NotNull Project project) {
+                    return Guice.createInjector(new IgnoreTestModule(project));
+                }
             }
-        }
     );
-    
-    @Nullable
-    protected final Project project;
 
     public static <T> T getInstance(@NotNull Class<T> type, @NotNull Project project) throws ExecutionException {
         return injector.get(project).getInstance(type);
     }
-
+    
     public static <T> T getInstance(@NotNull Class<T> type) throws ExecutionException {
-        return Guice.createInjector(new IgnoreModule(null)).getInstance(type);
+        return Guice.createInjector(new IgnoreTestModule(null)).getInstance(type);
     }
 
-    IgnoreModule(@Nullable Project project) {
-        this.project = project;
+    private IgnoreTestModule(@Nullable Project project) {
+        super(project);
     }
 
     @Override
-    protected void configure() {
-        installOpenIdeDependencies();
-        installProjectDependencies();
-        installProjectFactories();
-
-        install(new UtilsModule());
-
-    }
-
-    protected void installProjectFactories() {
-//        install(new FactoryModuleBuilder().build(IgnoreModuleFactory.class));
-    }
-
-    protected void installProjectDependencies() {
-        bind(IgnoreSettings.class).toInstance(ServiceManager.getService(IgnoreSettings.class));
-        bind(IgnoreApplicationComponent.class).toInstance(ApplicationManager.getApplication().getComponent(IgnoreApplicationComponent.class));
-
-        if (project != null) {
-            bind(OuterIgnoreLoaderComponent.class).toInstance(project.getComponent(OuterIgnoreLoaderComponent.class));
-        }
-
-        // Proxies
-        bind(IgnoreManager.class);
-        bind(AddTemplateAction.class);
-    }
-
     protected void installOpenIdeDependencies() {
-        bind(VirtualFileManager.class).toInstance(VirtualFileManager.getInstance());
-
-        if (project != null) {
-            bind(PsiManagerImpl.class).toInstance((PsiManagerImpl) PsiManager.getInstance(project));
-            bind(FileStatusManager.class).toInstance(FileStatusManager.getInstance(project));
-            bind(ProjectLevelVcsManager.class).toInstance(ProjectLevelVcsManager.getInstance(project));
-        }
+        bindMock(VirtualFileManager.class);
+        bindMock(PsiManagerImpl.class);
+        bindMock(FileStatusManager.class);
+        bindMock(ProjectLevelVcsManager.class);
     }
 
     @Provides
-    Project provideProject() {
-        return project;
+    @Singleton
+    GeneratorDialog provideGeneratorDialog() {
+        return Mockito.mock(GeneratorDialog.class);
+    }
+
+//    @Override
+//    protected void installProjectFactories() {
+//        IgnoreModuleFactory factory = Mockito.mock(IgnoreModuleFactory.class);
+//
+//        final GeneratorDialog dialog = Mockito.spy(factory.create(Mockito.any(Project.class)));
+////        Mockito.when(factory.create(project)).thenReturn(dialog);
+//
+//
+////        expect(factory.create((Project) anyObject())).andReturn(createNiceMock(GeneratorDialog.class));
+//        bind(IgnoreModuleFactory.class).toInstance(factory);
+//    }
+
+    @SuppressWarnings("unchecked")
+    private void bindMock(Class toMock) {
+        bind(toMock).toInstance(Mockito.mock(toMock));
     }
 }

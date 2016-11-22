@@ -24,6 +24,8 @@
 
 package mobi.hsz.idea.gitignore.ui;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.DefaultTreeExpander;
@@ -67,7 +69,8 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Set;
 
-import static mobi.hsz.idea.gitignore.util.Resources.Template.Container.*;
+import static mobi.hsz.idea.gitignore.util.Resources.Template.Container.STARRED;
+import static mobi.hsz.idea.gitignore.util.Resources.Template.Container.USER;
 
 /**
  * {@link GeneratorDialog} responsible for displaying list of all available templates and adding selected ones
@@ -129,12 +132,11 @@ public class GeneratorDialog extends DialogWrapper {
      * Builds a new instance of {@link GeneratorDialog}.
      *
      * @param project current working project
-     * @param file    current working file
      */
-    public GeneratorDialog(@NotNull Project project, @Nullable PsiFile file) {
+    @Inject
+    public GeneratorDialog(@NotNull Project project) {
         super(project, false);
         this.project = project;
-        this.file = file;
         this.root = new TemplateTreeNode();
         this.action = null;
         this.settings = IgnoreSettings.getInstance();
@@ -146,14 +148,21 @@ public class GeneratorDialog extends DialogWrapper {
     }
 
     /**
-     * Builds a new instance of {@link GeneratorDialog}.
-     *
-     * @param project current working project
-     * @param action  {@link CreateFileCommandAction} action instance to generate new file in the proper time
+     * Setter for {@link CreateFileCommandAction} action.
+     * 
+     * @param action file command action instance
      */
-    public GeneratorDialog(@NotNull Project project, @Nullable CreateFileCommandAction action) {
-        this(project, (PsiFile) null);
+    public void setAction(@Nullable CreateFileCommandAction action) {
         this.action = action;
+    }
+
+    /**
+     * Setter for {@link PsiFile} instance.
+     * 
+     * @param file {@link PsiFile} instance
+     */
+    public void setFile(@Nullable PsiFile file) {
+        this.file = file;
     }
 
     /**

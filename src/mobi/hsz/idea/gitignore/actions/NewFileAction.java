@@ -92,7 +92,8 @@ public class NewFileAction extends AnAction implements DumbAware {
 
         if (file == null && virtualFile == null) {
             CreateFileCommandAction action = new CreateFileCommandAction(project, directory, fileType);
-            dialog = new GeneratorDialog(project, action);
+            dialog = new GeneratorDialog(project);
+            dialog.setAction(action);
         } else {
             Notifications.Bus.notify(new Notification(
                     fileType.getLanguageName(),
@@ -105,7 +106,8 @@ public class NewFileAction extends AnAction implements DumbAware {
                 file = Utils.getPsiFile(project, virtualFile);
             }
 
-            dialog = new GeneratorDialog(project, file);
+            dialog = new GeneratorDialog(project);
+            dialog.setFile(file);
         }
 
         dialog.show();

@@ -151,9 +151,11 @@ public class MissingGitignoreNotificationProvider extends EditorNotifications.Pr
             public void run() {
                 PsiDirectory directory = PsiManager.getInstance(project).findDirectory(project.getBaseDir());
                 if (directory != null) {
-                    PsiFile file = new CreateFileCommandAction(project, directory, fileType).execute().getResultObject();
+                    final PsiFile file = new CreateFileCommandAction(project, directory, fileType).execute().getResultObject();
+                    final GeneratorDialog dialog = new GeneratorDialog(project);
                     FileEditorManager.getInstance(project).openFile(file.getVirtualFile(), true);
-                    new GeneratorDialog(project, file).show();
+                    dialog.setFile(file);
+                    dialog.show();
                 }
             }
         });

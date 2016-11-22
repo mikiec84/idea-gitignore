@@ -611,7 +611,7 @@ public class IgnoreManager implements ProjectComponent {
          */
         public Proxy(@NotNull Project project) throws ExecutionException {
             super();
-            delegate = IgnoreModule.getInstance(project, IgnoreManager.class);
+            delegate = IgnoreModule.getInstance(IgnoreManager.class, project);
             delegate.setProject(project);
         }
 

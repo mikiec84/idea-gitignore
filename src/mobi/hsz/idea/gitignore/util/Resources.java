@@ -51,10 +51,6 @@ public class Resources {
     @Nullable
     private static List<Template> resourceTemplates;
 
-    /** Private constructor to prevent creating {@link Resources} instance. */
-    private Resources() {
-    }
-
     /**
      * Returns list of gitignore templates.
      *

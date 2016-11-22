@@ -22,33 +22,18 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.actions;
+package mobi.hsz.idea.gitignore.util;
 
-import com.intellij.openapi.actionSystem.Presentation;
-import mobi.hsz.idea.gitignore.Common;
-import mobi.hsz.idea.gitignore.IgnoreTestModule;
+import com.google.inject.AbstractModule;
 
 /**
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
- * @since 1.5
+ * @since 1.6
  */
-public class CloseIgnoredEditorsActionTest extends Common {
-
-    private CloseIgnoredEditorsAction action;
-
+public class UtilsModule extends AbstractModule {
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        action = IgnoreTestModule.getInstance(CloseIgnoredEditorsAction.class, getProject());
-    }
-    
-    public void testCloseIgnoredEditorsActionInvocation() {
-        Presentation presentation;
-
-        presentation = myFixture.testAction(action);
-        assertEquals("Close Ignored", presentation.getText());
-        assertNull(presentation.getDescription());
-        assertFalse("Action is not visible if there is no Ignore file context", presentation.isEnabledAndVisible());
+    protected void configure() {
+        bind(CacheMap.class);
+        bind(Resources.class);
     }
 }

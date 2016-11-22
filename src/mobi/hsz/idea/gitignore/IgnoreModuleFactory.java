@@ -22,18 +22,17 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.util;
+package mobi.hsz.idea.gitignore;
 
-import mobi.hsz.idea.gitignore.Common;
-import org.junit.Test;
+import com.google.inject.assistedinject.Assisted;
+import com.intellij.openapi.project.Project;
+import mobi.hsz.idea.gitignore.ui.GeneratorDialog;
+import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
-
-public class ResourcesTest extends Common<Resources> {
-
-    @Test
-    public void testPrivateConstructor() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        privateConstructor(Resources.class);
-    }
-
+/**
+ * @author Jakub Chrzanowski <jakub@hsz.mobi>
+ * @since 1.6
+ */
+public interface IgnoreModuleFactory {
+    GeneratorDialog create(@Assisted @NotNull Project project);
 }

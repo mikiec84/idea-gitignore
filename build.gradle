@@ -49,15 +49,14 @@ intellij {
 
 idea {
     project {
-        jdkName         = javaVersion
-        languageLevel   = javaVersion
+        jdkName = javaVersion
+        languageLevel = javaVersion
     }
 
     module {
         generatedSourceDirs += file('gen')
     }
 }
-
 
 // Configurations
 
@@ -89,13 +88,23 @@ dependencies {
     bnf files("$buildDir/tools/light-psi-all.jar")
     jflex files("$buildDir/tools/JFlex.jar")
 
-    compile ('com.google.inject:guice:4.1.0')    
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile('com.google.inject:guice:4.1.0')
+    compile('com.google.inject.extensions:guice-assistedinject:4.1.0')
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.testng:testng:6.8'
+    testCompile 'org.powermock:powermock-module-testng:1.6.5'
+    testCompile 'org.powermock:powermock-api-mockito2:1.6.5'
 }
 
+test {
+    useTestNG()
+//    exclude 'com/urswolfer/intellij/plugin/gerrit/rest/GerritUtilTest.*' // fails with java.lang.VerifyError at GerritUtilTest.java:34
+}
 
 import de.undercouch.gradle.tasks.download.Download
 import groovy.io.FileType
+
 // Tasks
 
 task downloadJFlexJar(type: Download) {
@@ -160,7 +169,7 @@ task generateParser(type: JavaExec) {
     dependsOn unzipGrammarKit, downloadGrammarLightPsi
 
     main = 'org.intellij.grammar.Main'
-    args = [ 'gen', 'resources/bnf/Ignore.bnf' ]
+    args = ['gen', 'resources/bnf/Ignore.bnf']
 
     classpath = configurations.bnf + configurations.compile
 }
@@ -177,7 +186,7 @@ task generateTemplatesList() {
     dependsOn pullResources
 
     def content = "";
-    file('resources/gitignore').eachFileRecurse (FileType.FILES) { file ->
+    file('resources/gitignore').eachFileRecurse(FileType.FILES) { file ->
         if (file.name.endsWith(".gitignore")) {
             content += relativePath(file).substring(10) + "\n"
         }

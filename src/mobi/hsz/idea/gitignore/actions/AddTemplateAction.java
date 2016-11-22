@@ -24,14 +24,18 @@
 
 package mobi.hsz.idea.gitignore.actions;
 
+import com.google.inject.Inject;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import mobi.hsz.idea.gitignore.IgnoreBundle;
+import mobi.hsz.idea.gitignore.IgnoreModule;
 import mobi.hsz.idea.gitignore.psi.IgnoreFile;
 import mobi.hsz.idea.gitignore.ui.GeneratorDialog;
 import mobi.hsz.idea.gitignore.util.CommonDataKeys;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * Action that initiates adding new template to the selected .gitignore file.
@@ -40,6 +44,9 @@ import mobi.hsz.idea.gitignore.util.CommonDataKeys;
  * @since 0.5.3
  */
 public class AddTemplateAction extends AnAction {
+    @Inject
+    private GeneratorDialog dialog;
+    
     /** Builds a new instance of {@link AddTemplateAction}. */
     public AddTemplateAction() {
         super(IgnoreBundle.message("action.addTemplate"), IgnoreBundle.message("action.addTemplate.description"), null);
@@ -60,7 +67,9 @@ public class AddTemplateAction extends AnAction {
             return;
         }
 
-        new GeneratorDialog(project, file).show();
+
+        dialog.setFile(file);
+        dialog.show();
     }
 
     /**
@@ -78,5 +87,24 @@ public class AddTemplateAction extends AnAction {
             return;
         }
         getTemplatePresentation().setIcon(file.getFileType().getIcon());
+    }
+
+    /** Proxy class for {@link AddTemplateAction} to supply all the DependencyInjection flavours. */
+    private static class Proxy extends AddTemplateAction {
+        private final AddTemplateAction delegate;
+
+        public Proxy() throws ExecutionException {
+            delegate = IgnoreModule.getInstance(AddTemplateAction.class);
+        }
+
+        @Override
+        public void actionPerformed(AnActionEvent e) {
+            delegate.actionPerformed(e);
+        }
+
+        @Override
+        public void update(AnActionEvent e) {
+            delegate.update(e);
+        }
     }
 }
