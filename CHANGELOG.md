@@ -10,7 +10,8 @@
 
 **Fixed bugs:**
 
-- 
+- Component name collision with LombokPlugin [\#289](https://github.com/hsz/idea-gitignore/issues/289)
+- UI issues with "Languages settings" table component  [\#286](https://github.com/hsz/idea-gitignore/issues/286)
 
 ## [v1.6](https://github.com/hsz/idea-gitignore/tree/v1.6) (2016-11-23)
 
