@@ -35,7 +35,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferenceOwner;
 import com.intellij.util.containers.ContainerUtil;
-import mobi.hsz.idea.gitignore.FilesIndexCacheProjectComponent;
+import mobi.hsz.idea.gitignore.components.FilesIndexCacheProjectComponent;
 import mobi.hsz.idea.gitignore.IgnoreBundle;
 import mobi.hsz.idea.gitignore.psi.IgnoreEntry;
 import mobi.hsz.idea.gitignore.psi.IgnoreVisitor;

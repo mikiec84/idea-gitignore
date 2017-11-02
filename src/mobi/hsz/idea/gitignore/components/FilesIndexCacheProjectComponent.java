@@ -22,19 +22,21 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore;
+package mobi.hsz.idea.gitignore.components;
 
-import com.intellij.openapi.components.AbstractProjectComponent;
+import com.google.inject.Inject;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.roots.FileIndex;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.*;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.containers.ContainerUtil;
 import gnu.trove.THashSet;
+import lombok.experimental.Delegate;
+import mobi.hsz.idea.gitignore.IgnoreManager;
+import mobi.hsz.idea.gitignore.IgnoreModule;
 import mobi.hsz.idea.gitignore.util.Constants;
 import mobi.hsz.idea.gitignore.util.MatcherUtil;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +44,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 /**
@@ -52,18 +55,19 @@ import java.util.regex.Pattern;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 1.3.1
  */
-public class FilesIndexCacheProjectComponent extends AbstractProjectComponent {
+@SuppressWarnings("ComponentNotRegistered")
+public class FilesIndexCacheProjectComponent extends IgnoreProjectComponent<FilesIndexCacheProjectComponent> {
     /** Concurrent cache map. */
     @NotNull
-    private final ConcurrentMap<String, Collection<VirtualFile>> cacheMap;
+    private final ConcurrentMap<String, Collection<VirtualFile>> cacheMap = ContainerUtil.newConcurrentMap();
 
     /** {@link VirtualFileManager} instance. */
-    @NotNull
-    private final VirtualFileManager virtualFileManager;
+    @Inject
+    private VirtualFileManager virtualFileManager;
 
     /** {@link FileIndex} instance. */
-    @NotNull
-    private final FileIndex projectFileIndex;
+    @Inject
+    private FileIndex projectFileIndex;
 
     /** {@link VirtualFileListener} instance to watch for operations on the filesystem. */
     @NotNull
@@ -117,19 +121,7 @@ public class FilesIndexCacheProjectComponent extends AbstractProjectComponent {
      * @return {@link FilesIndexCacheProjectComponent instance}
      */
     public static FilesIndexCacheProjectComponent getInstance(@NotNull final Project project) {
-        return project.getComponent(FilesIndexCacheProjectComponent.class);
-    }
-
-    /**
-     * Initializes {@link #cacheMap} and {@link VirtualFileManager}.
-     *
-     * @param project current project
-     */
-    protected FilesIndexCacheProjectComponent(@NotNull final Project project) {
-        super(project);
-        cacheMap = ContainerUtil.newConcurrentMap();
-        virtualFileManager = VirtualFileManager.getInstance();
-        projectFileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+        return project.getComponent(FilesIndexCacheProjectComponent.Proxy.class);
     }
 
     /** Registers {@link #virtualFileListener} when project is opened. */
@@ -195,5 +187,25 @@ public class FilesIndexCacheProjectComponent extends AbstractProjectComponent {
     @Override
     public String getComponentName() {
         return "FilesIndexCacheProjectComponent";
+    }
+
+    /**
+     * Proxy class for {@link IgnoreManager} to supply all the DependencyInjection flavours.
+     */
+    @SuppressWarnings("UnusedDeclaration")
+    private static class Proxy extends FilesIndexCacheProjectComponent {
+
+        @Delegate
+        private final FilesIndexCacheProjectComponent delegate;
+
+        /**
+         * Constructor builds {@link Proxy} instance.
+         *
+         * @param project current project
+         */
+        public Proxy(@NotNull Project project) throws ExecutionException {
+            delegate = IgnoreModule.withProject(project).getInstance(FilesIndexCacheProjectComponent.class);
+            delegate.setProject(project);
+        }
     }
 }

@@ -533,7 +533,7 @@
             <loadForDefaultProject/>
         </component>
         <component>
-            <implementation-class>mobi.hsz.idea.gitignore.FilesIndexCacheProjectComponent</implementation-class>
+            <implementation-class>mobi.hsz.idea.gitignore.components.FilesIndexCacheProjectComponent$Proxy</implementation-class>
             <loadForDefaultProject/>
         </component>
         <component>
