@@ -22,21 +22,18 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.codeInsight;
+package mobi.hsz.idea.gitignore.codeInsight
 
-import com.intellij.codeInsight.daemon.impl.HighlightInfoType;
-import com.intellij.codeInsight.daemon.impl.SeveritiesProvider;
-import com.intellij.lang.annotation.HighlightSeverity;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.markup.TextAttributes;
-import com.intellij.ui.JBColor;
-import com.intellij.util.containers.ContainerUtil;
-import mobi.hsz.idea.gitignore.IgnoreBundle;
-import mobi.hsz.idea.gitignore.highlighter.IgnoreHighlighterColors;
-import org.jetbrains.annotations.NotNull;
-
-import java.awt.*;
-import java.util.List;
+import com.intellij.codeInsight.daemon.impl.HighlightInfoType
+import com.intellij.codeInsight.daemon.impl.SeveritiesProvider
+import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.editor.markup.TextAttributes
+import com.intellij.ui.JBColor
+import com.intellij.util.containers.ContainerUtil
+import mobi.hsz.idea.gitignore.IgnoreBundle
+import mobi.hsz.idea.gitignore.highlighter.IgnoreHighlighterColors
+import java.awt.Color
 
 /**
  * Severities provider that checks if entry points to any file or directory.
@@ -44,27 +41,24 @@ import java.util.List;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 0.5.4
  */
-public class UnusedEntrySeveritiesProvider extends SeveritiesProvider {
-    /** Unused entry {@link HighlightSeverity} instance. */
-    @NotNull
-    private static final HighlightSeverity UNUSED_ENTRY = new HighlightSeverity("UNUSED ENTRY", 10);
+class UnusedEntrySeveritiesProvider : SeveritiesProvider() {
 
     /**
      * Defines the style of matched entry.
      *
      * @return style definition
      */
-    @NotNull
-    @Override
-    public List<HighlightInfoType> getSeveritiesHighlightInfoTypes() {
-        final List<HighlightInfoType> result = ContainerUtil.newArrayList();
+    override fun getSeveritiesHighlightInfoTypes(): List<HighlightInfoType> {
+        val result = ContainerUtil.newArrayList<HighlightInfoType>()
 
-        result.add(new HighlightInfoType.HighlightInfoTypeImpl(
+        result.add(HighlightInfoType.HighlightInfoTypeImpl(
                 UNUSED_ENTRY,
-                TextAttributesKey.createTextAttributesKey(IgnoreBundle.message("codeInspection.unusedEntry"),
-                        IgnoreHighlighterColors.UNUSED_ENTRY))
-        );
-        return result;
+                TextAttributesKey.createTextAttributesKey(
+                        IgnoreBundle.message("codeInspection.unusedEntry"),
+                        IgnoreHighlighterColors.UNUSED_ENTRY
+                )
+        ))
+        return result
     }
 
     /**
@@ -73,19 +67,18 @@ public class UnusedEntrySeveritiesProvider extends SeveritiesProvider {
      * @param textAttributes current attribute
      * @return entry color
      */
-    @Override
-    public Color getTrafficRendererColor(@NotNull TextAttributes textAttributes) {
-        return JBColor.GRAY;
-    }
+    override fun getTrafficRendererColor(textAttributes: TextAttributes): Color = JBColor.GRAY
 
     /**
      * Checks if severity goto is enabled.
      *
      * @param minSeverity severity to compare
-     * @return severity equals to the {@link #UNUSED_ENTRY}
+     * @return severity equals to the [.UNUSED_ENTRY]
      */
-    @Override
-    public boolean isGotoBySeverityEnabled(HighlightSeverity minSeverity) {
-        return UNUSED_ENTRY != minSeverity;
+    override fun isGotoBySeverityEnabled(minSeverity: HighlightSeverity?): Boolean = UNUSED_ENTRY !== minSeverity
+
+    companion object {
+        /** Unused entry [HighlightSeverity] instance.  */
+        private val UNUSED_ENTRY = HighlightSeverity("UNUSED ENTRY", 10)
     }
 }

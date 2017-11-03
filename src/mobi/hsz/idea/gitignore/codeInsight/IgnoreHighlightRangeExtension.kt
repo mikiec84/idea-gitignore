@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.codeInsight;
+package mobi.hsz.idea.gitignore.codeInsight
 
-import com.intellij.codeInsight.daemon.impl.HighlightRangeExtension;
-import com.intellij.psi.PsiFile;
-import mobi.hsz.idea.gitignore.lang.IgnoreLanguage;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.codeInsight.daemon.impl.HighlightRangeExtension
+import com.intellij.psi.PsiFile
+import mobi.hsz.idea.gitignore.lang.IgnoreLanguage
 
 /**
  * Highlight common ranges in the file.
@@ -35,15 +34,12 @@ import org.jetbrains.annotations.NotNull;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 1.4
  */
-public class IgnoreHighlightRangeExtension implements HighlightRangeExtension {
+class IgnoreHighlightRangeExtension : HighlightRangeExtension {
     /**
-     * Checks if current {@link PsiFile} is allowed to enable range highlighting.
+     * Checks if current [PsiFile] is allowed to enable range highlighting.
      *
      * @param file current file
      * @return allowed to highlight
      */
-    @Override
-    public boolean isForceHighlightParents(@NotNull PsiFile file) {
-        return file.getLanguage() instanceof IgnoreLanguage;
-    }
+    override fun isForceHighlightParents(file: PsiFile): Boolean = file.language is IgnoreLanguage
 }
