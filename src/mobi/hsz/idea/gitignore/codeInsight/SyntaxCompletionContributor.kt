@@ -57,9 +57,7 @@ class SyntaxCompletionContributor : CompletionContributor() {
     }
 
     /** Allow autoPopup to appear after custom symbol.  */
-    override fun invokeAutoPopup(position: PsiElement, typeChar: Char): Boolean {
-        return true
-    }
+    override fun invokeAutoPopup(position: PsiElement, typeChar: Char): Boolean = true
 
     companion object {
         /** Allowed values for the completion.  */
