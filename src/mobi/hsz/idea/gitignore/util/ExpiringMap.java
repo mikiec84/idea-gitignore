@@ -84,7 +84,7 @@ public class ExpiringMap<K, V> {
     @NotNull
     public V set(@NotNull K key, @NotNull V value) {
         long current = System.currentTimeMillis();
-        map.put(key , Pair.create(value, current));
+        map.put(key, Pair.create(value, current));
         return value;
     }
 
