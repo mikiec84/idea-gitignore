@@ -371,7 +371,7 @@ public class IgnoreManager extends AbstractProjectComponent implements DumbAware
                     final String parentPath = !Utils.isInProject(entryFile, myProject) &&
                             myProject.getBasePath() != null ? myProject.getBasePath() : entryFile.getParent().getPath();
                     if (!StringUtil.startsWith(file.getPath(), parentPath) &&
-                            !ExternalIndexableSetContributor.getAdditionalFiles(myProject).contains(entryFile)) {
+                            !ExternalIndexableSetContributor.Companion.getAdditionalFiles(myProject).contains(entryFile)) {
                         continue;
                     }
                     relativePath = StringUtil.trimStart(file.getPath(), parentPath);
@@ -506,7 +506,7 @@ public class IgnoreManager extends AbstractProjectComponent implements DumbAware
         messageBus.subscribe(ProjectLevelVcsManager.VCS_CONFIGURATION_CHANGED, new VcsListener() {
             @Override
             public void directoryMappingChanged() {
-                ExternalIndexableSetContributor.invalidateCache(myProject);
+                ExternalIndexableSetContributor.Companion.invalidateCache(myProject);
                 vcsRoots.clear();
                 vcsRoots.addAll(ContainerUtil.newArrayList(projectLevelVcsManager.getAllVcsRoots()));
             }

@@ -104,7 +104,7 @@ public class IgnoreFileBasedIndexProjectHandler extends AbstractProjectComponent
     @Override
     public boolean isInSet(@NotNull VirtualFile file) {
         return file.getFileType() instanceof IgnoreFileType &&
-                ExternalIndexableSetContributor.getAdditionalFiles(myProject).contains(file);
+                ExternalIndexableSetContributor.Companion.getAdditionalFiles(myProject).contains(file);
     }
 
     /**

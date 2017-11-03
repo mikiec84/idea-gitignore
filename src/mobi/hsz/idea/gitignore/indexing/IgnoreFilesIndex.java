@@ -162,7 +162,7 @@ public class IgnoreFilesIndex extends AbstractIgnoreFilesIndex<IgnoreFileTypeKey
                  */
                 @Override
                 public void save(@NotNull DataOutput out, IgnoreEntryOccurrence entry) throws IOException {
-                    IgnoreEntryOccurrence.serialize(out, entry);
+                    IgnoreEntryOccurrence.Companion.serialize(out, entry);
                 }
 
                 /**
@@ -173,7 +173,7 @@ public class IgnoreFilesIndex extends AbstractIgnoreFilesIndex<IgnoreFileTypeKey
                  */
                 @Override
                 public IgnoreEntryOccurrence read(@NotNull DataInput in) {
-                    return IgnoreEntryOccurrence.deserialize(in);
+                    return IgnoreEntryOccurrence.Companion.deserialize(in);
                 }
             };
 
@@ -228,7 +228,7 @@ public class IgnoreFilesIndex extends AbstractIgnoreFilesIndex<IgnoreFileTypeKey
     public static List<IgnoreEntryOccurrence> getEntries(@NotNull Project project, @NotNull IgnoreFileType fileType) {
         try {
             if (ApplicationManager.getApplication().isReadAccessAllowed()) {
-                final GlobalSearchScope scope = IgnoreSearchScope.get(project);
+                final GlobalSearchScope scope = IgnoreSearchScope.Companion.get(project);
                 return FileBasedIndex.getInstance()
                         .getValues(IgnoreFilesIndex.KEY, new IgnoreFileTypeKey(fileType), scope);
             }

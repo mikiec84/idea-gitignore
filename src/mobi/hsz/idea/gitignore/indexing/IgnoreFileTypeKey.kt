@@ -22,61 +22,32 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.indexing;
+package mobi.hsz.idea.gitignore.indexing
 
-import mobi.hsz.idea.gitignore.file.type.IgnoreFileType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import mobi.hsz.idea.gitignore.file.type.IgnoreFileType
 
 /**
- * Decorator for {@link IgnoreFileType} to provide less unique hashcode when used with {@link IgnoreFilesIndex}.
+ * Decorator for [IgnoreFileType] to provide less unique hashcode when used with [IgnoreFilesIndex].
  *
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 2.0
  */
-public class IgnoreFileTypeKey {
-    /** Current file type. */
-    @NotNull
-    private final IgnoreFileType type;
-
-    /**
-     * Constructor.
-     *
-     * @param type current file type
-     */
-    public IgnoreFileTypeKey(@NotNull IgnoreFileType type) {
-        this.type = type;
-    }
-
-    /**
-     * Returns current file type.
-     *
-     * @return file type
-     */
-    @NotNull
-    public IgnoreFileType getType() {
-        return type;
-    }
-
+class IgnoreFileTypeKey(
+        val type: IgnoreFileType
+) {
     /**
      * Checks if file types are equal - if language names matches.
      *
-     * @param o object to check
+     * @param other object to check
      * @return file types are equal
      */
-    @Override
-    public boolean equals(@Nullable Object o) {
-        return o != null && o instanceof IgnoreFileTypeKey &&
-                ((IgnoreFileTypeKey) o).getType().getLanguageName().equals(this.type.getLanguageName());
-    }
+    override fun equals(other: Any?): Boolean =
+            other != null && other is IgnoreFileTypeKey && other.type.languageName == this.type.languageName
 
     /**
      * Returns hashcode using hashcode of the language's name.
      *
      * @return hashcode of language's name
      */
-    @Override
-    public int hashCode() {
-        return type.getLanguageName().hashCode();
-    }
+    override fun hashCode(): Int = type.languageName.hashCode()
 }

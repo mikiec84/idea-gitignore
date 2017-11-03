@@ -22,43 +22,36 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.indexing;
+package mobi.hsz.idea.gitignore.indexing
 
-import com.intellij.openapi.project.DumbAware;
-import com.intellij.util.indexing.*;
-import com.intellij.util.io.KeyDescriptor;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.project.DumbAware
+import com.intellij.util.indexing.DataIndexer
+import com.intellij.util.indexing.FileBasedIndex
+import com.intellij.util.indexing.FileBasedIndexExtension
+import com.intellij.util.indexing.FileContent
+import com.intellij.util.io.KeyDescriptor
 
 /**
- * Abstract class of {@link FileBasedIndexExtension} that contains base configuration for {@link IgnoreFilesIndex}.
+ * Abstract class of [FileBasedIndexExtension] that contains base configuration for [IgnoreFilesIndex].
  *
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 2.0
  */
-public abstract class AbstractIgnoreFilesIndex<K, V> extends FileBasedIndexExtension<K, V>
-        implements KeyDescriptor<K>, DataIndexer<K, V, FileContent>, FileBasedIndex.InputFilter, DumbAware {
+abstract class AbstractIgnoreFilesIndex<K, V> : FileBasedIndexExtension<K, V>(), KeyDescriptor<K>,
+        DataIndexer<K, V, FileContent>, FileBasedIndex.InputFilter, DumbAware {
+    /**
+     * Returns [DataIndexer] implementation.
+     *
+     * @return [DataIndexer] instance.
+     */
+    override fun getIndexer(): DataIndexer<K, V, FileContent> = this
 
     /**
-     * Returns {@link DataIndexer} implementation.
+     * Returns [KeyDescriptor] implementation.
      *
-     * @return {@link DataIndexer} instance.
+     * @return [KeyDescriptor] instance.
      */
-    @NotNull
-    @Override
-    public DataIndexer<K, V, FileContent> getIndexer() {
-        return this;
-    }
-
-    /**
-     * Returns {@link KeyDescriptor} implementation.
-     *
-     * @return {@link KeyDescriptor} instance.
-     */
-    @NotNull
-    @Override
-    public KeyDescriptor<K> getKeyDescriptor() {
-        return this;
-    }
+    override fun getKeyDescriptor(): KeyDescriptor<K> = this
 
     /**
      * Checks if given types objects are equal.
@@ -67,10 +60,7 @@ public abstract class AbstractIgnoreFilesIndex<K, V> extends FileBasedIndexExten
      * @param val2 object to compare
      * @return objects are equal
      */
-    @Override
-    public boolean isEqual(K val1, K val2) {
-        return val1.equals(val2);
-    }
+    override fun isEqual(val1: K, val2: K): Boolean = val1 == val2
 
     /**
      * Returns hashCode for given type object.
@@ -78,29 +68,19 @@ public abstract class AbstractIgnoreFilesIndex<K, V> extends FileBasedIndexExten
      * @param value type object
      * @return object's hashCode
      */
-    @Override
-    public int getHashCode(K value) {
-        return value.hashCode();
-    }
+    override fun getHashCode(value: K): Int = value!!.hashCode()
 
     /**
-     * Current {@link AbstractIgnoreFilesIndex} depends on the file content.
+     * Current [AbstractIgnoreFilesIndex] depends on the file content.
      *
      * @return depends on file content
      */
-    @Override
-    public boolean dependsOnFileContent() {
-        return true;
-    }
+    override fun dependsOnFileContent(): Boolean = true
 
     /**
-     * Returns {@link FileBasedIndex.InputFilter} implementation.
+     * Returns [FileBasedIndex.InputFilter] implementation.
      *
-     * @return {@link FileBasedIndex.InputFilter} instance.
+     * @return [FileBasedIndex.InputFilter] instance.
      */
-    @NotNull
-    @Override
-    public FileBasedIndex.InputFilter getInputFilter() {
-        return this;
-    }
+    override fun getInputFilter(): FileBasedIndex.InputFilter = this
 }

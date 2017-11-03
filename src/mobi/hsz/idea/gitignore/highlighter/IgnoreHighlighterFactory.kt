@@ -46,6 +46,6 @@ class IgnoreHighlighterFactory : SyntaxHighlighterFactory() {
      * @param virtualFile might be necessary to collect file specific settings
      * @return `SyntaxHighlighter` interface implementation for this particular language.
      */
-    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter
-            = IgnoreHighlighter(project, virtualFile)
+    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter =
+            IgnoreHighlighter(project, virtualFile)
 }

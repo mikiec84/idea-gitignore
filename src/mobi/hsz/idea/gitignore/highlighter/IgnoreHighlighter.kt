@@ -57,8 +57,8 @@ class IgnoreHighlighter(
      * @param tokenType element type
      * @return attributes list
      */
-    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey>
-            = SyntaxHighlighterBase.pack(ATTRIBUTES[tokenType])
+    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> =
+            SyntaxHighlighterBase.pack(ATTRIBUTES[tokenType])
 
     companion object {
         /** Attributes map.  */
