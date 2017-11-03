@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.highlighter;
+package mobi.hsz.idea.gitignore.highlighter
 
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
+import com.intellij.openapi.editor.colors.TextAttributesKey
 
 /**
  * Contains highlighter attributes definitions.
@@ -33,58 +33,58 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 0.2.2
  */
-public class IgnoreHighlighterColors {
+object IgnoreHighlighterColors {
     /** Default style for regular comment started with # */
-    public static final TextAttributesKey COMMENT = TextAttributesKey.createTextAttributesKey(
+    val COMMENT = TextAttributesKey.createTextAttributesKey(
             "IGNORE.COMMENT",
             DefaultLanguageHighlighterColors.LINE_COMMENT
-    );
+    )
 
     /** Default style for section comment started with ## */
-    public static final TextAttributesKey SECTION = TextAttributesKey.createTextAttributesKey(
+    val SECTION = TextAttributesKey.createTextAttributesKey(
             "IGNORE.SECTION",
             DefaultLanguageHighlighterColors.DOC_COMMENT
-    );
+    )
 
     /** Default style for header comment started with ### */
-    public static final TextAttributesKey HEADER = TextAttributesKey.createTextAttributesKey(
+    val HEADER = TextAttributesKey.createTextAttributesKey(
             "IGNORE.HEADER",
             DefaultLanguageHighlighterColors.DOC_COMMENT_TAG
-    );
+    )
 
     /** Default style for negation element - ! in the beginning of the entry */
-    public static final TextAttributesKey NEGATION = TextAttributesKey.createTextAttributesKey(
+    val NEGATION = TextAttributesKey.createTextAttributesKey(
             "IGNORE.NEGATION",
             DefaultLanguageHighlighterColors.KEYWORD
-    );
+    )
 
     /** Default style for negation element - ! in the beginning of the entry */
-    public static final TextAttributesKey BRACKET = TextAttributesKey.createTextAttributesKey(
+    val BRACKET = TextAttributesKey.createTextAttributesKey(
             "IGNORE.BRACKET",
             DefaultLanguageHighlighterColors.KEYWORD
-    );
+    )
 
     /** Default style for negation element - ! in the beginning of the entry */
-    public static final TextAttributesKey SLASH = TextAttributesKey.createTextAttributesKey(
+    val SLASH = TextAttributesKey.createTextAttributesKey(
             "IGNORE.SLASH",
             DefaultLanguageHighlighterColors.COMMA
-    );
+    )
 
     /** Default style for syntax element - syntax: */
-    public static final TextAttributesKey SYNTAX = TextAttributesKey.createTextAttributesKey(
+    val SYNTAX = TextAttributesKey.createTextAttributesKey(
             "IGNORE.SYNTAX",
             DefaultLanguageHighlighterColors.INSTANCE_FIELD
-    );
+    )
 
     /** Default style for negation element - ! in the beginning of the entry */
-    public static final TextAttributesKey VALUE = TextAttributesKey.createTextAttributesKey(
+    val VALUE = TextAttributesKey.createTextAttributesKey(
             "IGNORE.VALUE",
             DefaultLanguageHighlighterColors.STRING
-    );
+    )
 
     /** Default style for unused entry */
-    public static final TextAttributesKey UNUSED_ENTRY = TextAttributesKey.createTextAttributesKey(
+    val UNUSED_ENTRY = TextAttributesKey.createTextAttributesKey(
             "IGNORE.UNUSED_ENTRY",
             DefaultLanguageHighlighterColors.DOC_COMMENT
-    );
+    )
 }
