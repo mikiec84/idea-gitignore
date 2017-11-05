@@ -126,7 +126,7 @@ class OuterIgnoreLoaderComponent(project: Project) : AbstractProjectComponent(pr
          * @param project current project
          * @return [OuterIgnoreLoaderComponent]
          */
-        fun getInstance(project: Project): OuterIgnoreLoaderComponent =
+        fun getInstance(project: Project): OuterIgnoreLoaderComponent? =
                 project.getComponent(OuterIgnoreLoaderComponent::class.java)
     }
 }
