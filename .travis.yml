@@ -11,6 +11,9 @@ env:
   - IDEA_VERSION=2016.3.7
   - IDEA_VERSION=2016.2.5
   - IDEA_VERSION=2016.1.4
+  - IDEA_VERSION=163.15529.5
+  - IDEA_VERSION=145.2070.6
+  - IDEA_VERSION=139.1408.1
 
 # Workaround for https://github.com/travis-ci/travis-ci/issues/5227
 # Buffer overflow in Java_java_net_Inet4AddressImpl_getLocalHostName
