@@ -97,7 +97,7 @@
     ]]>
     </change-notes>
 
-    <idea-version since-build="123.72"/>
+    <idea-version since-build="143.2370"/>
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true">Git4Idea</depends>
 
