@@ -22,38 +22,28 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.lang;
+package mobi.hsz.idea.gitignore.lang
 
-import com.intellij.lang.BracePair;
-import com.intellij.lang.PairedBraceMatcher;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.tree.IElementType;
-import mobi.hsz.idea.gitignore.psi.IgnoreTypes;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.lang.BracePair
+import com.intellij.lang.PairedBraceMatcher
+import com.intellij.psi.PsiFile
+import com.intellij.psi.tree.IElementType
+import mobi.hsz.idea.gitignore.psi.IgnoreTypes
 
 /**
- * Definition of {@link PairedBraceMatcher} class.
+ * Definition of [PairedBraceMatcher] class.
  *
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 0.5
  */
-public class IgnoreBraceMatcher implements PairedBraceMatcher {
-    /** Array of definitions for brace pairs. */
-    private static final BracePair[] PAIRS = new BracePair[]{
-            new BracePair(IgnoreTypes.BRACKET_LEFT, IgnoreTypes.BRACKET_RIGHT, false),
-    };
-
+class IgnoreBraceMatcher : PairedBraceMatcher {
     /**
      * Returns the array of definitions for brace pairs that need to be matched when
      * editing code in the language.
      *
      * @return the array of brace pair definitions.
      */
-    @Override
-    public BracePair[] getPairs() {
-        return PAIRS;
-    }
+    override fun getPairs(): Array<BracePair> = PAIRS
 
     /**
      * Returns true if paired rbrace should be inserted after lbrace of given type when lbrace is encountered before
@@ -64,11 +54,7 @@ public class IgnoreBraceMatcher implements PairedBraceMatcher {
      * @param contextType token type that follows lbrace
      * @return true / false as described
      */
-    @Override
-    public boolean isPairedBracesAllowedBeforeType(@NotNull IElementType lbraceType,
-                                                   @Nullable IElementType contextType) {
-        return true;
-    }
+    override fun isPairedBracesAllowedBeforeType(lbraceType: IElementType, contextType: IElementType?): Boolean = true
 
     /**
      * Returns the start offset of the code construct which owns the opening structural brace at the specified offset.
@@ -78,8 +64,10 @@ public class IgnoreBraceMatcher implements PairedBraceMatcher {
      * @param openingBraceOffset the offset of an opening structural brace.
      * @return the offset of corresponding code construct, or the same offset if not defined.
      */
-    @Override
-    public int getCodeConstructStart(PsiFile file, int openingBraceOffset) {
-        return openingBraceOffset;
+    override fun getCodeConstructStart(file: PsiFile, openingBraceOffset: Int): Int = openingBraceOffset
+
+    companion object {
+        /** Array of definitions for brace pairs.  */
+        private val PAIRS = arrayOf(BracePair(IgnoreTypes.BRACKET_LEFT, IgnoreTypes.BRACKET_RIGHT, false))
     }
 }

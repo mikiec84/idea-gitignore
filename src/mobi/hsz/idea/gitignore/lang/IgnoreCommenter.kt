@@ -22,11 +22,10 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.lang;
+package mobi.hsz.idea.gitignore.lang
 
-import com.intellij.lang.Commenter;
-import mobi.hsz.idea.gitignore.util.Constants;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.lang.Commenter
+import mobi.hsz.idea.gitignore.util.Constants
 
 /**
  * Defines the support for "Comment with Line Comment" and "Comment with Block Comment"
@@ -35,18 +34,14 @@ import org.jetbrains.annotations.Nullable;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 0.4
  */
-public class IgnoreCommenter implements Commenter {
+class IgnoreCommenter : Commenter {
     /**
      * Returns the string which prefixes a line comment in the language, or null if the language
      * does not support line comments.
      *
      * @return the line comment text, or null.
      */
-    @Nullable
-    @Override
-    public String getLineCommentPrefix() {
-        return Constants.HASH;
-    }
+    override fun getLineCommentPrefix(): String? = Constants.HASH
 
     /**
      * Returns the string which marks the beginning of a block comment in the language,
@@ -54,11 +49,7 @@ public class IgnoreCommenter implements Commenter {
      *
      * @return the block comment start text, or null.
      */
-    @Nullable
-    @Override
-    public String getBlockCommentPrefix() {
-        return null;
-    }
+    override fun getBlockCommentPrefix(): String? = null
 
     /**
      * Returns the string which marks the end of a block comment in the language,
@@ -66,11 +57,7 @@ public class IgnoreCommenter implements Commenter {
      *
      * @return the block comment end text, or null.
      */
-    @Nullable
-    @Override
-    public String getBlockCommentSuffix() {
-        return null;
-    }
+    override fun getBlockCommentSuffix(): String? = null
 
     /**
      * Returns the string which marks the commented beginning of a block comment in the language,
@@ -78,11 +65,7 @@ public class IgnoreCommenter implements Commenter {
      *
      * @return the commented block comment start text, or null.
      */
-    @Nullable
-    @Override
-    public String getCommentedBlockCommentPrefix() {
-        return null;
-    }
+    override fun getCommentedBlockCommentPrefix(): String? = null
 
     /**
      * Returns the string which marks the commented end of a block comment in the language,
@@ -90,9 +73,5 @@ public class IgnoreCommenter implements Commenter {
      *
      * @return the commented block comment end text, or null.
      */
-    @Nullable
-    @Override
-    public String getCommentedBlockCommentSuffix() {
-        return null;
-    }
+    override fun getCommentedBlockCommentSuffix(): String? = null
 }
