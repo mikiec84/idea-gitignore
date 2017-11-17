@@ -122,7 +122,8 @@ class IgnoreColorSettingsPage : ColorSettingsPage {
                 AttributesDescriptor(IgnoreBundle.message("highlighter.brackets"), IgnoreHighlighterColors.BRACKET),
                 AttributesDescriptor(IgnoreBundle.message("highlighter.slash"), IgnoreHighlighterColors.SLASH),
                 AttributesDescriptor(IgnoreBundle.message("highlighter.syntax"), IgnoreHighlighterColors.SYNTAX),
-                AttributesDescriptor(IgnoreBundle.message("highlighter.value"), IgnoreHighlighterColors.VALUE)
+                AttributesDescriptor(IgnoreBundle.message("highlighter.value"), IgnoreHighlighterColors.VALUE),
+                AttributesDescriptor(IgnoreBundle.message("highlighter.unused"), IgnoreHighlighterColors.UNUSED)
         )
 
         /**

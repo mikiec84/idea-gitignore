@@ -75,7 +75,7 @@ class ExternalIndexableSetContributor : IndexableSetContributor() {
                 for (language in IgnoreBundle.LANGUAGES) {
                     val fileType = language.fileType
                     if (language.isOuterFileSupported) {
-                        for (file in language.getOuterFiles(project)) {
+                        for (file in language.getOuterFiles(project, true)) {
                             if (file == null || !file.isValid) {
                                 continue
                             }
