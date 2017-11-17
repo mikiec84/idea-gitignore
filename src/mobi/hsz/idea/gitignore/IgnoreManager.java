@@ -331,7 +331,8 @@ public class IgnoreManager extends AbstractProjectComponent implements DumbAware
         if (cached != null) {
             return cached;
         }
-        if (DumbService.isDumb(myProject) || !isEnabled() || baseDir == null || !Utils.isUnder(file, baseDir)) {
+        if (DumbService.isDumb(myProject) || !isEnabled() || baseDir == null || !Utils.isUnder(file, baseDir) ||
+                Utils.isInsideEventProcessing()) {
             return false;
         }
 

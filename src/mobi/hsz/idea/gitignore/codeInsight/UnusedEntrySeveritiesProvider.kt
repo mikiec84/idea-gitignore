@@ -55,7 +55,7 @@ class UnusedEntrySeveritiesProvider : SeveritiesProvider() {
                 UNUSED_ENTRY,
                 TextAttributesKey.createTextAttributesKey(
                         IgnoreBundle.message("codeInspection.unusedEntry"),
-                        IgnoreHighlighterColors.UNUSED_ENTRY
+                        IgnoreHighlighterColors.UNUSED
                 )
         ))
         return result

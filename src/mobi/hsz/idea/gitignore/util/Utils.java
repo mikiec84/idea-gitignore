@@ -61,6 +61,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import static com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES;
@@ -535,5 +536,27 @@ public class Utils {
             data.addText(data.getPresentableText(), REGULAR_ATTRIBUTES);
         }
         data.addText(" " + text, attributes);
+    }
+
+    /**
+     * Checks if we're currently inside event processing.
+     *
+     * @return event is processed
+     */
+    public static boolean isInsideEventProcessing() {
+        try {
+            return (Boolean) Class
+                    .forName("com.intellij.openapi.project.NoAccessDuringPsiEvents")
+                    .getMethod("isInsideEventProcessing")
+                    .invoke(null);
+        } catch (ClassNotFoundException e) {
+            return false;
+        } catch (NoSuchMethodException e) {
+            return false;
+        } catch (IllegalAccessException e) {
+            return false;
+        } catch (InvocationTargetException e) {
+            return false;
+        }
     }
 }
