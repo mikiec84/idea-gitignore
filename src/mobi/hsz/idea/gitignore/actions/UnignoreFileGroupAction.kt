@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.actions;
+package mobi.hsz.idea.gitignore.actions
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.vfs.VirtualFile;
-import mobi.hsz.idea.gitignore.settings.IgnoreSettings;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.vfs.VirtualFile
+import mobi.hsz.idea.gitignore.settings.IgnoreSettings
 
 /**
  * Group action that unignores specified file or directory.
@@ -37,47 +36,34 @@ import org.jetbrains.annotations.NotNull;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 1.6
  */
-public class UnignoreFileGroupAction extends IgnoreFileGroupAction {
-    /** Ignore settings instance. */
-    private IgnoreSettings settings;
+class UnignoreFileGroupAction : IgnoreFileGroupAction(
+        "action.addToUnignore.group",
+        "action.addToUnignore.group.description",
+        "action.addToUnignore.group.noPopup"
+) {
+    /** Ignore settings instance.  */
+    private val settings: IgnoreSettings = IgnoreSettings.getInstance()
 
     /**
-     * Builds a new instance of {@link UnignoreFileGroupAction}.
-     * Describes action's presentation.
-     */
-    public UnignoreFileGroupAction() {
-        super(
-                "action.addToUnignore.group",
-                "action.addToUnignore.group.description",
-                "action.addToUnignore.group.noPopup"
-        );
-        settings = IgnoreSettings.getInstance();
-    }
-
-    /**
-     * Creates new {@link UnignoreFileAction} action instance.
+     * Creates new [UnignoreFileAction] action instance.
      *
      * @param file current file
      * @return action instance
      */
-    @Override
-    protected IgnoreFileAction createAction(@NotNull VirtualFile file) {
-        return new UnignoreFileAction(file);
-    }
+    override fun createAction(file: VirtualFile): IgnoreFileAction = UnignoreFileAction(file)
 
     /**
-     * Presents a list of suitable Gitignore files that can cover currently selected {@link VirtualFile}.
+     * Presents a list of suitable Gitignore files that can cover currently selected [VirtualFile].
      * Shows a subgroup with available files or one option if only one Gitignore file is available.
-     * Group will be hidden if {@link IgnoreSettings#isUnignoreActions()} is set to <code>false</code>.
+     * Group will be hidden if [IgnoreSettings.isUnignoreActions] is set to `false`.
      *
      * @param e action event
      */
-    @Override
-    public void update(AnActionEvent e) {
-        boolean status = settings.isUnignoreActions();
-        e.getPresentation().setVisible(status);
+    override fun update(e: AnActionEvent) {
+        val status = settings.isUnignoreActions
+        e.presentation.isVisible = status
         if (status) {
-            super.update(e);
+            super.update(e)
         }
     }
 }

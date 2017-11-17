@@ -22,51 +22,30 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.actions;
+package mobi.hsz.idea.gitignore.actions
 
-import com.intellij.openapi.vfs.VirtualFile;
-import mobi.hsz.idea.gitignore.file.type.IgnoreFileType;
-import mobi.hsz.idea.gitignore.util.Utils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.vfs.VirtualFile
+import mobi.hsz.idea.gitignore.file.type.IgnoreFileType
+import mobi.hsz.idea.gitignore.util.Utils
 
 /**
- * Action that adds currently selected {@link VirtualFile} to the specified Ignore {@link VirtualFile} as unignored.
- * Action is added to the IDE context menus not directly but with {@link UnignoreFileGroupAction} action.
+ * Action that adds currently selected [VirtualFile] to the specified Ignore [VirtualFile] as unignored.
+ * Action is added to the IDE context menus not directly but with [UnignoreFileGroupAction] action.
  *
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 1.6
  */
-@SuppressWarnings("ComponentNotRegistered")
-public class UnignoreFileAction extends IgnoreFileAction {
+class UnignoreFileAction(
+        fileType: IgnoreFileType?,
+        virtualFile: VirtualFile?
+) : IgnoreFileAction(fileType, virtualFile, "action.addToUnignore", "action.addToUnignore.description") {
     /**
-     * Builds a new instance of {@link IgnoreFileAction}.
-     * Default project's Ignore file will be used.
-     */
-    public UnignoreFileAction() {
-        this(null);
-    }
-
-    /**
-     * Builds a new instance of {@link IgnoreFileAction}.
+     * Builds a new instance of [IgnoreFileAction].
      * Describes action's presentation.
      *
      * @param virtualFile Gitignore file
      */
-    public UnignoreFileAction(@Nullable VirtualFile virtualFile) {
-        this(Utils.getFileType(virtualFile), virtualFile);
-    }
-
-    /**
-     * Builds a new instance of {@link IgnoreFileAction}.
-     * Describes action's presentation.
-     *
-     * @param fileType    Current file type
-     * @param virtualFile Gitignore file
-     */
-    public UnignoreFileAction(@Nullable IgnoreFileType fileType, @Nullable VirtualFile virtualFile) {
-        super(fileType, virtualFile, "action.addToUnignore", "action.addToUnignore.description");
-    }
+    @JvmOverloads constructor(virtualFile: VirtualFile? = null) : this(Utils.getFileType(virtualFile), virtualFile)
 
     /**
      * Gets the file's path relative to the specified root directory.
@@ -76,10 +55,8 @@ public class UnignoreFileAction extends IgnoreFileAction {
      * @param file file used for generating output path
      * @return relative path
      */
-    @NotNull
-    @Override
-    protected String getPath(@NotNull VirtualFile root, @NotNull VirtualFile file) {
-        final String path = super.getPath(root, file);
-        return path.isEmpty() ? path : '!' + path;
+    override fun getPath(root: VirtualFile, file: VirtualFile): String {
+        val path = super.getPath(root, file)
+        return if (path.isEmpty()) path else '!' + path
     }
 }
