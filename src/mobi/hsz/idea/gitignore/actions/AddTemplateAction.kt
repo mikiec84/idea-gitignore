@@ -22,16 +22,14 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.actions;
+package mobi.hsz.idea.gitignore.actions
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiFile;
-import mobi.hsz.idea.gitignore.IgnoreBundle;
-import mobi.hsz.idea.gitignore.psi.IgnoreFile;
-import mobi.hsz.idea.gitignore.ui.GeneratorDialog;
-import mobi.hsz.idea.gitignore.util.CommonDataKeys;
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import mobi.hsz.idea.gitignore.IgnoreBundle
+import mobi.hsz.idea.gitignore.psi.IgnoreFile
+import mobi.hsz.idea.gitignore.ui.GeneratorDialog
+import mobi.hsz.idea.gitignore.util.CommonDataKeys
 
 /**
  * Action that initiates adding new template to the selected .gitignore file.
@@ -39,44 +37,42 @@ import mobi.hsz.idea.gitignore.util.CommonDataKeys;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 0.5.3
  */
-public class AddTemplateAction extends AnAction {
-    /** Builds a new instance of {@link AddTemplateAction}. */
-    public AddTemplateAction() {
-        super(IgnoreBundle.message("action.addTemplate"), IgnoreBundle.message("action.addTemplate.description"), null);
-    }
-
+/** Builds a new instance of [AddTemplateAction].  */
+class AddTemplateAction : AnAction(
+        IgnoreBundle.message("action.addTemplate"),
+        IgnoreBundle.message("action.addTemplate.description"),
+        null
+) {
     /**
      * Handles an action of adding new template.
-     * Ignores action if selected file is not a {@link IgnoreFile} instance, otherwise shows {@link GeneratorDialog}.
+     * Ignores action if selected file is not a [IgnoreFile] instance, otherwise shows [GeneratorDialog].
      *
      * @param e action event
      */
-    @Override
-    public void actionPerformed(AnActionEvent e) {
-        final Project project = e.getData(CommonDataKeys.PROJECT);
-        final PsiFile file = e.getData(CommonDataKeys.PSI_FILE);
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.getData(CommonDataKeys.PROJECT)
+        val file = e.getData(CommonDataKeys.PSI_FILE)
 
-        if (project == null || file == null || !(file instanceof IgnoreFile)) {
-            return;
+        if (project == null || file == null || file !is IgnoreFile) {
+            return
         }
 
-        new GeneratorDialog(project, file).show();
+        GeneratorDialog(project, file).show()
     }
 
     /**
      * Updates visibility of the action presentation in various actions list.
-     * Visible only for {@link IgnoreFile} context.
+     * Visible only for [IgnoreFile] context.
      *
      * @param e action event
      */
-    @Override
-    public void update(AnActionEvent e) {
-        final PsiFile file = e.getData(CommonDataKeys.PSI_FILE);
+    override fun update(e: AnActionEvent) {
+        val file = e.getData(CommonDataKeys.PSI_FILE)
 
-        if (file == null || !(file instanceof IgnoreFile)) {
-            e.getPresentation().setVisible(false);
-            return;
+        if (file == null || file !is IgnoreFile) {
+            e.presentation.isVisible = false
+            return
         }
-        getTemplatePresentation().setIcon(file.getFileType().getIcon());
+        templatePresentation.icon = file.fileType.icon
     }
 }

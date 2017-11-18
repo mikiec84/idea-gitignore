@@ -22,12 +22,36 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore
+package mobi.hsz.idea.gitignore.actions
+
+import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.project.DumbAware
+import mobi.hsz.idea.gitignore.IgnoreBundle
+import mobi.hsz.idea.gitignore.util.Icons
 
 /**
- * Ignore [Exception] definition.
+ * Creates a group of [NewFileAction] instances.
  *
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
- * @since 0.5.1
+ * @since 0.9
  */
-open class IgnoreException : Exception()
+class NewFileGroupAction : DefaultActionGroup(), DumbAware {
+    init {
+        isPopup = true
+        val presentation = templatePresentation
+        presentation.text = IgnoreBundle.message("action.newFile.group")
+        presentation.icon = Icons.IGNORE
+
+        for (language in IgnoreBundle.LANGUAGES) {
+            val fileType = language.fileType
+            add(object : NewFileAction(fileType) {
+                init {
+                    val p = templatePresentation
+                    p.text = IgnoreBundle.message("action.newFile", language.filename, language.id)
+                    p.description = IgnoreBundle.message("action.newFile.description", language.id)
+                    p.icon = fileType.icon
+                }
+            })
+        }
+    }
+}
