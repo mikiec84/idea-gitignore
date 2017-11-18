@@ -22,52 +22,49 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.codeInspection;
+package mobi.hsz.idea.gitignore.codeInspection
 
-import com.intellij.codeInspection.LocalInspectionTool;
-import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.psi.PsiElementVisitor;
-import mobi.hsz.idea.gitignore.IgnoreBundle;
-import mobi.hsz.idea.gitignore.lang.IgnoreLanguage;
-import mobi.hsz.idea.gitignore.psi.IgnoreSyntax;
-import mobi.hsz.idea.gitignore.psi.IgnoreVisitor;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.codeInspection.LocalInspectionTool
+import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.psi.PsiElementVisitor
+import mobi.hsz.idea.gitignore.IgnoreBundle
+import mobi.hsz.idea.gitignore.psi.IgnoreEntry
+import mobi.hsz.idea.gitignore.psi.IgnoreVisitor
+import mobi.hsz.idea.gitignore.util.Glob
+
+import java.util.regex.Pattern
+import java.util.regex.PatternSyntaxException
 
 /**
- * Inspection tool that checks if syntax entry has correct value.
+ * Inspection tool that checks if entry has correct form in specific according to the specific [ ].
  *
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
- * @since 0.5
+ * @since 1.0
  */
-public class IgnoreSyntaxEntryInspection extends LocalInspectionTool {
+class IgnoreIncorrectEntryInspection : LocalInspectionTool() {
     /**
-     * Checks if syntax entry has correct value.
+     * Checks if entry has correct form in specific according to the specific [IgnoreBundle.Syntax].
      *
      * @param holder     where visitor will register problems found.
      * @param isOnTheFly true if inspection was run in non-batch mode
      * @return not-null visitor for this inspection
      */
-    @NotNull
-    @Override
-    public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
-        return new IgnoreVisitor() {
-            @Override
-            public void visitSyntax(@NotNull IgnoreSyntax syntax) {
-                IgnoreLanguage language = (IgnoreLanguage) syntax.getContainingFile().getLanguage();
-                if (!language.isSyntaxSupported()) {
-                    return;
+    override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
+        return object : IgnoreVisitor() {
+            override fun visitEntry(entry: IgnoreEntry) {
+                var regex = entry.text
+                if (IgnoreBundle.Syntax.GLOB == entry.syntax) {
+                    regex = Glob.createRegex(regex, false)
                 }
 
-                String value = syntax.getValue().getText();
-                for (IgnoreBundle.Syntax s : IgnoreBundle.Syntax.values()) {
-                    if (s.toString().equals(value)) {
-                        return;
-                    }
+                try {
+                    Pattern.compile(regex)
+                } catch (e: PatternSyntaxException) {
+                    holder.registerProblem(entry,
+                            IgnoreBundle.message("codeInspection.incorrectEntry.message", e.description))
                 }
 
-                holder.registerProblem(syntax, IgnoreBundle.message("codeInspection.syntaxEntry.message"),
-                        new IgnoreSyntaxEntryFix(syntax));
             }
-        };
+        }
     }
 }

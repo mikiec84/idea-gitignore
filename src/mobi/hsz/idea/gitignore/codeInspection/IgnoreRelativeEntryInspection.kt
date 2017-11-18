@@ -22,19 +22,17 @@
  * SOFTWARE.
  */
 
-package mobi.hsz.idea.gitignore.codeInspection;
+package mobi.hsz.idea.gitignore.codeInspection
 
-import com.intellij.codeInspection.InspectionManager;
-import com.intellij.codeInspection.LocalInspectionTool;
-import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.psi.PsiFile;
-import mobi.hsz.idea.gitignore.IgnoreBundle;
-import mobi.hsz.idea.gitignore.psi.IgnoreEntry;
-import mobi.hsz.idea.gitignore.psi.IgnoreFile;
-import mobi.hsz.idea.gitignore.psi.IgnoreVisitor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.codeInspection.InspectionManager
+import com.intellij.codeInspection.LocalInspectionTool
+import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.psi.PsiFile
+import mobi.hsz.idea.gitignore.IgnoreBundle
+import mobi.hsz.idea.gitignore.psi.IgnoreEntry
+import mobi.hsz.idea.gitignore.psi.IgnoreFile
+import mobi.hsz.idea.gitignore.psi.IgnoreVisitor
 
 /**
  * Inspection tool that checks if entry is relative.
@@ -42,48 +40,42 @@ import org.jetbrains.annotations.Nullable;
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 0.8
  */
-public class IgnoreRelativeEntryInspection extends LocalInspectionTool {
+class IgnoreRelativeEntryInspection : LocalInspectionTool() {
     /**
      * Checks if entries are relative.
      *
      * @param file       current working file yo check
-     * @param manager    {@link InspectionManager} to ask for {@link ProblemDescriptor}'s from
+     * @param manager    [InspectionManager] to ask for [ProblemDescriptor]'s from
      * @param isOnTheFly true if called during on the fly editor highlighting. Called from Inspect Code action
-     *                   otherwise
-     * @return <code>null</code> if no problems found or not applicable at file level
+     * otherwise
+     * @return `null` if no problems found or not applicable at file level
      */
-    @Nullable
-    @Override
-    public ProblemDescriptor[] checkFile(@NotNull PsiFile file,
-                                         @NotNull InspectionManager manager, boolean isOnTheFly) {
-        if (!(file instanceof IgnoreFile)) {
-            return null;
+    override fun checkFile(file: PsiFile,
+                           manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
+        if (file !is IgnoreFile) {
+            return null
         }
 
-        final ProblemsHolder problemsHolder = new ProblemsHolder(manager, file, isOnTheFly);
+        val problemsHolder = ProblemsHolder(manager, file, isOnTheFly)
 
-        file.acceptChildren(new IgnoreVisitor() {
-            @Override
-            public void visitEntry(@NotNull IgnoreEntry entry) {
-                String path = entry.getText().replaceAll("\\\\(.)", "$1");
+        file.acceptChildren(object : IgnoreVisitor() {
+            override fun visitEntry(entry: IgnoreEntry) {
+                val path = entry.text.replace("\\\\(.)".toRegex(), "$1")
                 if (path.contains("./")) {
                     problemsHolder.registerProblem(entry, IgnoreBundle.message("codeInspection.relativeEntry.message"),
-                            new IgnoreRelativeEntryFix(entry));
+                            IgnoreRelativeEntryFix(entry))
                 }
-                super.visitEntry(entry);
+                super.visitEntry(entry)
             }
-        });
+        })
 
-        return problemsHolder.getResultsArray();
+        return problemsHolder.resultsArray
     }
 
     /**
      * Forces checking every entry in checked file.
      *
-     * @return <code>true</code>
+     * @return `true`
      */
-    @Override
-    public boolean runForWholeFile() {
-        return true;
-    }
+    override fun runForWholeFile(): Boolean = true
 }
