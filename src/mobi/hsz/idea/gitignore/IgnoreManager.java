@@ -24,11 +24,11 @@
 
 package mobi.hsz.idea.gitignore;
 
+import com.google.inject.Inject;
 import com.intellij.ProjectTopics;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.projectView.impl.AbstractProjectViewPane;
 import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.extensions.Extensions;
@@ -98,20 +98,20 @@ public class IgnoreManager extends AbstractProjectComponent implements DumbAware
     public static final Map<String, IgnoreFileType> FILE_TYPES_ASSOCIATION_QUEUE = ContainerUtil.newConcurrentMap();
 
     /** {@link VirtualFileManager} instance. */
-    @NotNull
-    private final VirtualFileManager virtualFileManager;
+    @Inject
+    private VirtualFileManager virtualFileManager;
 
     /** {@link IgnoreSettings} instance. */
-    @NotNull
-    private final IgnoreSettings settings;
+    @Inject
+    private IgnoreSettings settings;
 
     /** {@link FileStatusManager} instance. */
-    @NotNull
-    private final FileStatusManager statusManager;
+    @Inject
+    private FileStatusManager statusManager;
 
     /** {@link ProjectLevelVcsManager} instance. */
-    @NotNull
-    private final ProjectLevelVcsManager projectLevelVcsManager;
+    @Inject
+    private ProjectLevelVcsManager projectLevelVcsManager;
 
     /** {@link RefreshTrackedIgnoredRunnable} instance. */
     @NotNull
@@ -283,7 +283,7 @@ public class IgnoreManager extends AbstractProjectComponent implements DumbAware
                     break;
 
                 case HIDE_IGNORED_FILES:
-                    ProjectView.getInstance(myProject).refresh();
+                    IgnoreModule.inject(ProjectView.class, myProject).refresh();
                     break;
 
             }
@@ -296,6 +296,7 @@ public class IgnoreManager extends AbstractProjectComponent implements DumbAware
      * @param project current project
      * @return {@link IgnoreManager instance}
      */
+    @Deprecated
     @NotNull
     public static IgnoreManager getInstance(@NotNull final Project project) {
         return project.getComponent(IgnoreManager.class);
@@ -308,14 +309,13 @@ public class IgnoreManager extends AbstractProjectComponent implements DumbAware
      */
     public IgnoreManager(@NotNull final Project project) {
         super(project);
-        this.virtualFileManager = VirtualFileManager.getInstance();
-        this.settings = IgnoreSettings.getInstance();
-        this.statusManager = FileStatusManager.getInstance(project);
+        IgnoreModule.injectMembers(this, myProject);
+
+        ProjectView x = IgnoreModule.inject(ProjectView.class, myProject);
         this.refreshTrackedIgnoredRunnable = new RefreshTrackedIgnoredRunnable();
         this.refreshTrackedIgnoredFeature =
                 new InterruptibleScheduledFuture(debouncedRefreshTrackedIgnores, 10000, 5);
         this.refreshTrackedIgnoredFeature.setTrailing(true);
-        this.projectLevelVcsManager = ProjectLevelVcsManager.getInstance(project);
         this.commonRunnableListeners = new CommonRunnableListeners(debouncedStatusesChanged);
     }
 
@@ -423,9 +423,9 @@ public class IgnoreManager extends AbstractProjectComponent implements DumbAware
      * @param fileType file type to bind with pattern
      */
     public static void associateFileType(@NotNull final String fileName, @NotNull final IgnoreFileType fileType) {
-        final Application application = ApplicationManager.getApplication();
+        final Application application = IgnoreModule.inject(Application.class);
         if (application.isDispatchThread()) {
-            final FileTypeManager fileTypeManager = FileTypeManager.getInstance();
+            final FileTypeManager fileTypeManager = IgnoreModule.inject(FileTypeManager.class);
             application.invokeLater(new Runnable() {
                 @Override
                 public void run() {

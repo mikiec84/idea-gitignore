@@ -24,6 +24,8 @@
 
 package mobi.hsz.idea.gitignore;
 
+import com.google.inject.Inject;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.project.Project;
 import mobi.hsz.idea.gitignore.util.Notify;
@@ -37,7 +39,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class IgnoreUpdateComponent extends AbstractProjectComponent {
     /** {@link IgnoreApplicationComponent} instance. */
-    private IgnoreApplicationComponent application;
+    @Inject
+    private Application application;
 
     /**
      * Constructor.
@@ -46,18 +49,7 @@ public class IgnoreUpdateComponent extends AbstractProjectComponent {
      */
     protected IgnoreUpdateComponent(@NotNull Project project) {
         super(project);
-    }
-
-    /** Component initialization method. */
-    @Override
-    public void initComponent() {
-        application = IgnoreApplicationComponent.getInstance();
-    }
-
-    /** Component dispose method. */
-    @Override
-    public void disposeComponent() {
-        application = null;
+        IgnoreModule.injectMembers(this, project);
     }
 
     /**
@@ -74,8 +66,9 @@ public class IgnoreUpdateComponent extends AbstractProjectComponent {
     /** Method called when project is opened. */
     @Override
     public void projectOpened() {
-        if (application.isUpdated() && !application.isRC() && !application.isUpdateNotificationShown()) {
-            application.setUpdateNotificationShown(true);
+        final IgnoreApplicationComponent component = application.getComponent(IgnoreApplicationComponent.class);
+        if (component.isUpdated() && !component.isRC() && !component.isUpdateNotificationShown()) {
+            component.setUpdateNotificationShown(true);
             Notify.showUpdate(myProject);
         }
     }

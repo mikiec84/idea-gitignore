@@ -26,13 +26,17 @@ package mobi.hsz.idea.gitignore;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
+import com.google.inject.*;
+import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.impl.DummyProject;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.FileStatusManager;
+import com.intellij.openapi.vcs.ProjectLevelVcsManager;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.containers.ContainerUtil;
 import mobi.hsz.idea.gitignore.settings.IgnoreSettings;
 import org.jetbrains.annotations.NotNull;
@@ -65,8 +69,7 @@ public class IgnoreModule extends AbstractModule {
      */
     private IgnoreModule(@NotNull final Project project) {
         this.project = project;
-
-        injectorSupplier = Suppliers.memoize(new Supplier<Injector>() {
+        this.injectorSupplier = Suppliers.memoize(new Supplier<Injector>() {
             @Override
             public Injector get() {
                 return Guice.createInjector(IgnoreModule.this);
@@ -118,10 +121,52 @@ public class IgnoreModule extends AbstractModule {
         get(project).injectorSupplier.get().injectMembers(object);
     }
 
+    /**
+     * Injects DI members.
+     *
+     * @param clz class to inject
+     */
+    public static <T> T inject(@NotNull Class<T> clz) {
+        return inject(clz, DummyProject.getInstance());
+    }
+
+    /**
+     * Injects DI members.
+     *
+     * @param clz     class to inject
+     * @param project current project
+     */
+    public static <T> T inject(@NotNull Class<T> clz, @NotNull Project project) {
+        return get(project).injectorSupplier.get().getInstance(clz);
+    }
+
     /** Injections setup. */
     @Override
     protected void configure() {
+        // plugin
         bind(IgnoreSettings.class).toInstance(ServiceManager.getService(IgnoreSettings.class));
+
+        // IDE
+        bind(Application.class).toInstance(ApplicationManager.getApplication());
+        bind(FileTypeManager.class).toInstance(FileTypeManager.getInstance());
+        bind(VirtualFileManager.class).toInstance(VirtualFileManager.getInstance());
+
+        if (project instanceof DummyProject) {
+            return;
+        }
+
+        // plugin
+
+
+        // IDE
+        bind(FileStatusManager.class).toInstance(FileStatusManager.getInstance(project));
+        bind(ProjectLevelVcsManager.class).toInstance(ProjectLevelVcsManager.getInstance(project));
+        bind(ProjectView.class).toProvider(new Provider<ProjectView>() {
+            @Override
+            public ProjectView get() {
+                return ProjectView.getInstance(project);
+            }
+        });
     }
 
     /**

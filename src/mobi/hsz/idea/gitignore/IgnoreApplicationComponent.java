@@ -25,7 +25,6 @@
 package mobi.hsz.idea.gitignore;
 
 import com.google.inject.Inject;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
 import mobi.hsz.idea.gitignore.settings.IgnoreSettings;
 import mobi.hsz.idea.gitignore.util.Utils;
@@ -47,16 +46,6 @@ public class IgnoreApplicationComponent implements ApplicationComponent {
 
     @Inject
     private IgnoreSettings settings;
-
-    /**
-     * Get Ignore Application Component
-     *
-     * @return Ignore Application Component
-     */
-    @NotNull
-    public static IgnoreApplicationComponent getInstance() {
-        return ApplicationManager.getApplication().getComponent(IgnoreApplicationComponent.class);
-    }
 
     /** Component initialization method. */
     @Override
