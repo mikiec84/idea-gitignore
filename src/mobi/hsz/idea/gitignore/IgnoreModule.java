@@ -34,6 +34,8 @@ import com.intellij.openapi.command.impl.DummyProject;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.FileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -157,8 +159,8 @@ public class IgnoreModule extends AbstractModule {
 
         // plugin
 
-
         // IDE
+        bind(FileIndex.class).toInstance(ProjectRootManager.getInstance(project).getFileIndex());
         bind(FileStatusManager.class).toInstance(FileStatusManager.getInstance(project));
         bind(ProjectLevelVcsManager.class).toInstance(ProjectLevelVcsManager.getInstance(project));
         bind(ProjectView.class).toProvider(new Provider<ProjectView>() {
