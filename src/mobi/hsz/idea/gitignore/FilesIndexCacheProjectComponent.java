@@ -24,11 +24,11 @@
 
 package mobi.hsz.idea.gitignore;
 
+import com.google.inject.Inject;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.roots.FileIndex;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.*;
 import com.intellij.psi.search.FilenameIndex;
@@ -55,15 +55,15 @@ import java.util.regex.Pattern;
 public class FilesIndexCacheProjectComponent extends AbstractProjectComponent {
     /** Concurrent cache map. */
     @NotNull
-    private final ConcurrentMap<String, Collection<VirtualFile>> cacheMap;
+    private final ConcurrentMap<String, Collection<VirtualFile>> cacheMap = ContainerUtil.newConcurrentMap();
 
     /** {@link VirtualFileManager} instance. */
-    @NotNull
-    private final VirtualFileManager virtualFileManager;
+    @Inject
+    private VirtualFileManager virtualFileManager;
 
     /** {@link FileIndex} instance. */
-    @NotNull
-    private final FileIndex projectFileIndex;
+    @Inject
+    private FileIndex projectFileIndex;
 
     /** {@link VirtualFileListener} instance to watch for operations on the filesystem. */
     @NotNull
@@ -116,6 +116,7 @@ public class FilesIndexCacheProjectComponent extends AbstractProjectComponent {
      * @param project current project
      * @return {@link FilesIndexCacheProjectComponent instance}
      */
+    @Deprecated
     public static FilesIndexCacheProjectComponent getInstance(@NotNull final Project project) {
         return project.getComponent(FilesIndexCacheProjectComponent.class);
     }
@@ -127,9 +128,7 @@ public class FilesIndexCacheProjectComponent extends AbstractProjectComponent {
      */
     protected FilesIndexCacheProjectComponent(@NotNull final Project project) {
         super(project);
-        cacheMap = ContainerUtil.newConcurrentMap();
-        virtualFileManager = VirtualFileManager.getInstance();
-        projectFileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+        IgnoreModule.injectMembers(this, project);
     }
 
     /** Registers {@link #virtualFileListener} when project is opened. */
