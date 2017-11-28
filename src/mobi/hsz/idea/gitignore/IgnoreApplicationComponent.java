@@ -24,6 +24,7 @@
 
 package mobi.hsz.idea.gitignore;
 
+import com.google.inject.Inject;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
 import mobi.hsz.idea.gitignore.settings.IgnoreSettings;
@@ -44,6 +45,9 @@ public class IgnoreApplicationComponent implements ApplicationComponent {
     /** Plugin update notification has been shown. */
     private boolean updateNotificationShown;
 
+    @Inject
+    private IgnoreSettings settings;
+
     /**
      * Get Ignore Application Component
      *
@@ -57,8 +61,9 @@ public class IgnoreApplicationComponent implements ApplicationComponent {
     /** Component initialization method. */
     @Override
     public void initComponent() {
+        IgnoreModule.injectMembers(this);
+
         /* The settings storage object. */
-        final IgnoreSettings settings = IgnoreSettings.getInstance();
         updated = !Utils.getVersion().equals(settings.getVersion());
         rc = Utils.getVersion().toUpperCase().contains("RC");
         if (updated) {

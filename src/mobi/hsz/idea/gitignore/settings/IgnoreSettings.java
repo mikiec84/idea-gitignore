@@ -145,6 +145,7 @@ public class IgnoreSettings implements PersistentStateComponent<Element>, Listen
      *
      * @return the unique {@link IgnoreSettings} instance.
      */
+    @Deprecated
     public static IgnoreSettings getInstance() {
         return ServiceManager.getService(IgnoreSettings.class);
     }
