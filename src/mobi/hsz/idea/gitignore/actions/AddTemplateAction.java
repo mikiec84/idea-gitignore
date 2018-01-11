@@ -24,14 +24,18 @@
 
 package mobi.hsz.idea.gitignore.actions;
 
+import com.google.inject.Inject;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import mobi.hsz.idea.gitignore.IgnoreBundle;
+import mobi.hsz.idea.gitignore.IgnoreModule;
 import mobi.hsz.idea.gitignore.psi.IgnoreFile;
 import mobi.hsz.idea.gitignore.ui.GeneratorDialog;
 import mobi.hsz.idea.gitignore.util.CommonDataKeys;
+import mobi.hsz.idea.gitignore.util.Utils;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Action that initiates adding new template to the selected .gitignore file.
@@ -40,6 +44,9 @@ import mobi.hsz.idea.gitignore.util.CommonDataKeys;
  * @since 0.5.3
  */
 public class AddTemplateAction extends AnAction {
+    @Inject
+    private GeneratorDialog dialog;
+
     /** Builds a new instance of {@link AddTemplateAction}. */
     public AddTemplateAction() {
         super(IgnoreBundle.message("action.addTemplate"), IgnoreBundle.message("action.addTemplate.description"), null);
@@ -52,15 +59,19 @@ public class AddTemplateAction extends AnAction {
      * @param e action event
      */
     @Override
-    public void actionPerformed(AnActionEvent e) {
-        final Project project = e.getData(CommonDataKeys.PROJECT);
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
         final PsiFile file = e.getData(CommonDataKeys.PSI_FILE);
 
         if (project == null || file == null || !(file instanceof IgnoreFile)) {
             return;
         }
 
-        new GeneratorDialog(project, file).show();
+        if (!Utils.isUnitTestMode()) {
+            IgnoreModule.injectMembers(this, project);
+        }
+
+        dialog.setFile(file).show();
     }
 
     /**

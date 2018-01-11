@@ -24,19 +24,43 @@
 
 package mobi.hsz.idea.gitignore.actions;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.psi.PsiFile;
+import com.intellij.testFramework.TestActionEvent;
 import mobi.hsz.idea.gitignore.Common;
 import mobi.hsz.idea.gitignore.IgnoreBundle;
 import mobi.hsz.idea.gitignore.file.type.IgnoreFileType;
+import mobi.hsz.idea.gitignore.ui.GeneratorDialog;
 import org.junit.Assert;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 1.5
  */
 public class AddTemplateActionTest extends Common<AddTemplateAction> {
+    @Mock
+    private GeneratorDialog dialog;
+
+    @InjectMocks
+    private AddTemplateAction action;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        MockitoAnnotations.initMocks(this);
+
+        when(dialog.setFile(any(PsiFile.class))).thenReturn(dialog);
+    }
+
     public void testAddTemplateActionInvocation() {
-        final AddTemplateAction action = new AddTemplateAction();
         Presentation presentation;
 
         presentation = myFixture.testAction(action);
@@ -47,5 +71,10 @@ public class AddTemplateActionTest extends Common<AddTemplateAction> {
         myFixture.configureByText(IgnoreFileType.INSTANCE, "foo");
         presentation = myFixture.testAction(action);
         Assert.assertTrue("Action is visible if there is Ignore file context", presentation.isEnabledAndVisible());
+
+        AnActionEvent emptyEvent = new TestActionEvent(DataContext.EMPTY_CONTEXT);
+        action.actionPerformed(emptyEvent);
+        verify(dialog, times(1)).setFile(any(PsiFile.class));
+        verify(dialog, times(1)).show();
     }
 }

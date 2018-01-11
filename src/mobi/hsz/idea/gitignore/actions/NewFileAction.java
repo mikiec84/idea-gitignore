@@ -105,7 +105,7 @@ public class NewFileAction extends AnAction implements DumbAware {
                 file = Utils.getPsiFile(project, virtualFile);
             }
 
-            dialog = new GeneratorDialog(project, file);
+            dialog = new GeneratorDialog(project).setFile(file);
         }
 
         dialog.show();

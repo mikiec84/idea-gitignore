@@ -24,21 +24,61 @@
 
 package mobi.hsz.idea.gitignore.actions;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.vcs.AbstractVcs;
+import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import mobi.hsz.idea.gitignore.Common;
+import org.junit.Assert;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Jakub Chrzanowski <jakub@hsz.mobi>
  * @since 1.5
  */
 public class CloseIgnoredEditorsActionTest extends Common {
-    public void testCloseIgnoredEditorsActionInvocation() {
-        final CloseIgnoredEditorsAction action = new CloseIgnoredEditorsAction();
-        Presentation presentation;
+    @Mock
+    private ProjectLevelVcsManager projectLevelVcsManager;
 
-        presentation = myFixture.testAction(action);
+    @InjectMocks
+    private CloseIgnoredEditorsAction action;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        MockitoAnnotations.initMocks(this);
+
+//        when(dialog.setFile(any(PsiFile.class))).thenReturn(dialog);
+//
+//        AbstractModule module = new TestsModule(getProject());
+//        IgnoreModule.EXTERNAL_MODULES.add(module);
+//        System.out.println("x");
+    }
+
+    public void testCloseIgnoredEditorsActionInvocation() {
+        Presentation presentation = myFixture.testAction(action);
         assertEquals("Close Ignored", presentation.getText());
         assertNull(presentation.getDescription());
         assertFalse("Action is not visible if there is no Ignore file context", presentation.isEnabledAndVisible());
+
+        assertEquals("Close _Ignored", action.getPresentationText(false));
+        assertEquals("Close _Ignored In Group", action.getPresentationText(true));
+    }
+
+    public void testIsActionEnabled() {
+        Presentation presentation = myFixture.testAction(action);
+        Assert.assertFalse("Action is not enabled", presentation.isEnabled());
+
+
+        when(action.isActionEnabled(getProject(), any(AnActionEvent.class))).thenReturn(true);
+        when(projectLevelVcsManager.getAllActiveVcss()).thenReturn(new AbstractVcs[2]);
+        presentation = myFixture.testAction(action);
+        Assert.assertTrue("Action is enabled", presentation.isEnabled());
+
     }
 }

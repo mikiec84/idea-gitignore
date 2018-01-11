@@ -43,6 +43,7 @@ import com.intellij.util.containers.ContainerUtil;
 import mobi.hsz.idea.gitignore.settings.IgnoreSettings;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -52,6 +53,8 @@ import java.util.Map;
  * @since 3.0
  */
 public class IgnoreModule extends AbstractModule {
+    public static final ArrayList<AbstractModule> EXTERNAL_MODULES = ContainerUtil.newArrayList();
+
     /** Injectors supplier. */
     @NotNull
     private final Supplier<Injector> injectorSupplier;
@@ -62,19 +65,22 @@ public class IgnoreModule extends AbstractModule {
 
     /** Available injectors map. */
     @NotNull
-    private static final Map<Project, Supplier<Injector>> INJECTOR_MAP = ContainerUtil.newHashMap();
+    static final Map<Project, Supplier<Injector>> INJECTOR_MAP = ContainerUtil.newHashMap();
 
     /**
      * Default constructor that initializes new supplier.
      *
      * @param project current project
      */
-    private IgnoreModule(@NotNull final Project project) {
+    IgnoreModule(@NotNull final Project project) {
         this.project = project;
         this.injectorSupplier = Suppliers.memoize(new Supplier<Injector>() {
             @Override
             public Injector get() {
-                return Guice.createInjector(IgnoreModule.this);
+                ArrayList<AbstractModule> modules = ContainerUtil.newArrayList();
+                modules.add(IgnoreModule.this);
+                ContainerUtil.addAll(modules, EXTERNAL_MODULES);
+                return Guice.createInjector(modules);
             }
         });
 
@@ -87,7 +93,7 @@ public class IgnoreModule extends AbstractModule {
      * @param project          current project
      * @param injectorSupplier existing injector
      */
-    private IgnoreModule(@NotNull Project project, @NotNull Supplier<Injector> injectorSupplier) {
+    IgnoreModule(@NotNull Project project, @NotNull Supplier<Injector> injectorSupplier) {
         this.project = project;
         this.injectorSupplier = injectorSupplier;
     }

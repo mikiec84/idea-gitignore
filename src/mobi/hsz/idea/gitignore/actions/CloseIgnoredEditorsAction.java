@@ -24,14 +24,18 @@
 
 package mobi.hsz.idea.gitignore.actions;
 
+import com.google.inject.Inject;
 import com.intellij.ide.actions.CloseEditorsActionBase;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileEditor.impl.EditorComposite;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.AbstractVcs;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vcs.ProjectLevelVcsManager;
 import mobi.hsz.idea.gitignore.IgnoreBundle;
+import mobi.hsz.idea.gitignore.IgnoreModule;
+import mobi.hsz.idea.gitignore.util.Utils;
 import mobi.hsz.idea.gitignore.vcs.IgnoreFileStatusProvider;
 
 /**
@@ -41,6 +45,9 @@ import mobi.hsz.idea.gitignore.vcs.IgnoreFileStatusProvider;
  * @since 1.2
  */
 public class CloseIgnoredEditorsAction extends CloseEditorsActionBase {
+    @Inject
+    private ProjectLevelVcsManager projectLevelVcsManager;
+
     /**
      * Obtains if editor is allowed to be closed.
      *
@@ -60,8 +67,12 @@ public class CloseIgnoredEditorsAction extends CloseEditorsActionBase {
      */
     @Override
     protected boolean isActionEnabled(final Project project, final AnActionEvent event) {
-        return super.isActionEnabled(project, event) &&
-                ProjectLevelVcsManager.getInstance(project).getAllActiveVcss().length > 0;
+        if (!Utils.isUnitTestMode()) {
+            IgnoreModule.injectMembers(this, project);
+        }
+
+        AbstractVcs[] a = projectLevelVcsManager.getAllActiveVcss();
+        return super.isActionEnabled(project, event) && projectLevelVcsManager.getAllActiveVcss().length > 0;
     }
 
     /**

@@ -24,6 +24,7 @@
 
 package mobi.hsz.idea.gitignore.ui;
 
+import com.google.inject.Inject;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.DefaultTreeExpander;
@@ -133,12 +134,11 @@ public class GeneratorDialog extends DialogWrapper {
      * Builds a new instance of {@link GeneratorDialog}.
      *
      * @param project current working project
-     * @param file    current working file
      */
-    public GeneratorDialog(@NotNull Project project, @Nullable PsiFile file) {
+    @Inject
+    public GeneratorDialog(@NotNull Project project) {
         super(project, false);
         this.project = project;
-        this.file = file;
         this.root = new TemplateTreeNode();
         this.action = null;
         this.settings = IgnoreSettings.getInstance();
@@ -156,7 +156,7 @@ public class GeneratorDialog extends DialogWrapper {
      * @param action  {@link CreateFileCommandAction} action instance to generate new file in the proper time
      */
     public GeneratorDialog(@NotNull Project project, @Nullable CreateFileCommandAction action) {
-        this(project, (PsiFile) null);
+        this(project);
         this.action = action;
     }
 
@@ -616,6 +616,17 @@ public class GeneratorDialog extends DialogWrapper {
     @Nullable
     public PsiFile getFile() {
         return file;
+    }
+
+    /**
+     * Sets current file.
+     *
+     * @param file current file
+     */
+    @NotNull
+    public GeneratorDialog setFile(@Nullable PsiFile file) {
+        this.file = file;
+        return this;
     }
 
     /** Custom templates {@link FilterComponent}. */
